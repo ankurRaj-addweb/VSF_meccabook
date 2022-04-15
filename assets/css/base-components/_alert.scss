@@ -1,0 +1,44 @@
+	.offer-header{
+		background: $navy;
+		color: $white;
+		position: relative;
+		padding: 8px 0;
+		@media all and (min-width: 768px){
+			padding: 14px 0 12px;
+		}
+	}
+	.offer-header p{
+		text-align: center;
+		@include fontsize(12px);
+		font-weight: 400;
+		margin: 0;
+		padding: 0 35px;
+		@media all and (min-width: 768px){
+			@include fontsize(14px);
+		}
+	}
+	.offer-header .close-btn{
+		width: 12px;
+		height: 12px;
+		background: transparent;
+		border: none;
+		outline: none;
+		appearance: none;
+		-webkit-appearance: none;
+		background: url(/meccabook/icon-close.svg) no-repeat;
+		background-size: cover;
+		display: block;
+		&:hover{
+			transition: 0.3s;
+			opacity: 0.7;
+		}
+	}
+	.offer-header .btn-wrap{
+		position: absolute;
+		top: 50%;
+		right: 15px;
+		transform: translate(0, -50%);
+		@media all and (min-width: 768px){
+			right: 14px;
+		}
+	}

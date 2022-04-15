@@ -1,0 +1,42 @@
+
+.inc-dcr-item {
+    width: 85px;
+    height: 25px;
+    border: 1px solid $border-clr;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 7px;
+    @media all and (min-width: 768px){
+        margin-bottom: 0;
+    }
+    .onlyNumber {
+        @include fontsize(18px);
+        line-height:24px;  
+        font-weight: $fw-light;
+        width: 52px;
+        text-align: center;
+        margin: 0;
+        height: 23px;
+        padding: 0;
+        border:0;
+        color: $gray-dark;
+    }
+    .decre-btn {
+        @include abs(50%,auto,auto,0);
+        background: url(/meccabook/Icon-minus.svg) no-repeat center center;
+        transform: translateY(-50%);
+        width: 24px;
+        height: 100%;
+        border: 0;
+    }
+    .incr-btn {
+        @include abs(50%,0,auto,auto);
+        background: url(/meccabook/Icon-plus.svg) no-repeat center center;
+        transform: translateY(-50%);
+        width: 24px;
+        height: 100%;
+        border: 0;
+    }
+}
