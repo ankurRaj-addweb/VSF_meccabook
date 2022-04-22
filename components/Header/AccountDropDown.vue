@@ -50,9 +50,6 @@
         <router-link to="/" v-if="currentUser" class="acc-link"
           >Orders</router-link
         >
-        <router-link to="/" v-if="currentUser" class="acc-link"
-          >Payment Methods</router-link
-        >
         <router-link to="/" class="acc-link">Wishlist</router-link>
       </div>
     </div>

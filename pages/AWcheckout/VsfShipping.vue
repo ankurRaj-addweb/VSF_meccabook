@@ -1,6 +1,6 @@
 <template>
 <div class="shipping-popup-block" v-if="isAuthenticated && hasSavedShippingAddress && !newAddressform">
-  <ValidationObserver v-slot="{ handleSubmit, dirty, reset }">
+  <ValidationObserver v-slot="{ handleSubmit, reset }">
     <form @submit.prevent="handleSubmit(handleAddressSubmit(reset))" class="address-form p-0">
       <UserShippingAddresses
         v-if="isAuthenticated && hasSavedShippingAddress && !newAddressform"
@@ -36,7 +36,7 @@
             @input="telephone => changeShippingDetails('telephone', telephone)"
           />
         </ValidationProvider>
-        </div> 
+        </div>
       </div>
       <div class="coln-two d-md-flex justify-content-between">
         <div class="input-wrap">
@@ -77,7 +77,7 @@
           />
         </ValidationProvider>
         </div>
-      </div>    
+      </div>
       <div class="coln-two d-md-flex justify-content-between">
         <div class="input-wrap input-shipping">
         <ValidationProvider
@@ -126,7 +126,7 @@
           </SfSelect>
         </ValidationProvider>
         </div>
-      </div>  
+      </div>
       <div class="coln-two d-md-flex justify-content-between">
         <div class="input-wrap input-shipping">
           <ValidationProvider
@@ -242,7 +242,6 @@
       <div class="form">
         <div class="form__action">
           <SfButton
-            v-if="!(isShippingDetailsStepCompleted && !dirty)"
             v-e2e="'select-shipping'"
             :disabled="loading"
             class="form__action-button btn larg-btn py-2"
@@ -250,29 +249,21 @@
           >
             <span>{{ $t('continue') }} </span>
           </SfButton>
-          <button v-else @click="nextStep" class="btn larg-btn text-uppercase">
-            <span>Next</span>
-          </button>
         </div>
       </div>
-      
-      <!-- <VsfShippingProvider
-        @submit="$router.push('/checkout/billing')"
-      /> -->
     </form>
   </ValidationObserver>
 </div>
 <div v-else>
-  <Shipping />
+  <Shipping v-if="newAddressform" :addressLengthIsZero="addressLengthIsZero" />
+    <div v-else>
+    <LoadingSpinner/>
+  </div>
 </div>
-<!-- <div v-else>
-  <LoadingSpinner/>
-</div> -->
 </template>
 
 <script>
 import {
-  SfHeading,
   SfButton,
   SfSelect,
 } from '@storefront-ui/vue';
@@ -290,11 +281,12 @@ import {
   useShipping,
   useUser,
   useUserShipping,
+  useBilling
 } from '@vue-storefront/magento';
 import { required, min, digits } from 'vee-validate/dist/rules';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { addressFromApiToForm } from '~/helpers/checkout/address';
-import { useUiState, useUiNotification } from "~/composables";
+import { useUiState } from "~/composables";
 import AwInput from '../AwComponents/atoms/AwInput.vue';
 import Shipping from './Shipping.vue';
 import LoadingSpinner from '../../components/LoadingSpinner.vue';
@@ -317,7 +309,6 @@ extend('digits', {
 export default defineComponent({
   name: 'ShippingStep',
   components: {
-    SfHeading,
     AwInput,
     SfButton,
     SfSelect,
@@ -335,6 +326,12 @@ export default defineComponent({
       loading,
       shipping: address,
     } = useShipping();
+
+    const {
+      save: billingSave,
+      billing: billingAddress,
+    } = useBilling();
+
     const {
       shipping: userShipping,
       load: loadUserShipping,
@@ -355,10 +352,11 @@ export default defineComponent({
     const isFormSubmitted = ref(false);
     const canAddNewAddress = ref(true);
     const spinnerStatus = ref(false);
+    const addressLengthIsZero = ref();
 
     const isShippingDetailsStepCompleted = ref(false);
 
-    const { checkoutstep, nextStep,preStep, newAddressform, toggleAddressForm } = useUiState();
+    const { nextStep, preStep, newAddressform, openAddressform, toggleAddressForm } = useUiState();
 
     const canMoveForward = computed(() => !loading.value && shippingDetails.value && Object.keys(
       shippingDetails.value,
@@ -386,6 +384,17 @@ export default defineComponent({
       // @TODO remove ignore when https://github.com/vuestorefront/vue-storefront/issues/5967 is applied
       // @ts-ignore
       await save({ shippingDetails: shippingDetailsData });
+
+
+      await billingSave({
+         billingDetails: {
+            ...shippingDetails.value,
+            customerAddressId: addressId,
+            sameAsShipping: true,
+         },
+      });
+
+      //await billingSave({ billingDetails: shippingDetailsData });
       if (addressId !== NOT_SELECTED_ADDRESS && setAsDefault.value) {
         const chosenAddress = userShippingGetters.getAddresses(
           userShipping.value,
@@ -396,15 +405,15 @@ export default defineComponent({
         }
       }
       spinnerStatus.value= false;
-      await nextStep();
       reset();
       isShippingDetailsStepCompleted.value = true;
+      if(isShippingDetailsStepCompleted.value === true && addressId) {
+        await nextStep();
+      }
     };
 
     const handleAddNewAddressBtnClick = () => {
-      // currentAddressId.value = NOT_SELECTED_ADDRESS;
-      // shippingDetails.value = {};
-      toggleAddressForm();
+      openAddressform();
       isShippingDetailsStepCompleted.value = false;
     };
 
@@ -455,6 +464,9 @@ export default defineComponent({
     });
 
     onMounted(async () => {
+      await loadUserShipping();
+      console.log(newAddressform.value,'newAddressform');
+      console.log(hasSavedShippingAddress,'hasSavedShippingAddress');
       if (shippingDetails.value?.country_code) {
         await searchCountry({ id: shippingDetails.value.country_code });
       }
@@ -465,12 +477,10 @@ export default defineComponent({
       const shippingAddresses = userShippingGetters.getAddresses(userShipping.value);
 
       if (!shippingAddresses || shippingAddresses.length === 0) {
+        openAddressform();
+        addressLengthIsZero.value = true;
         return;
       }
-
-      // if(checkoutstep < 2 && shippingMethods){
-      //   nextStep();
-      // }
 
       const hasEmptyShippingDetails = !shippingDetails.value || Object.keys(shippingDetails.value).length === 0;
       if (hasEmptyShippingDetails) {
@@ -507,7 +517,9 @@ export default defineComponent({
       ToggleformOpen,
       toggleAddressForm,
       newAddressform,
-      spinnerStatus
+      openAddressform,
+      spinnerStatus,
+      addressLengthIsZero
 
     };
   },

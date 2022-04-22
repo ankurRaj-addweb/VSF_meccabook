@@ -1,12 +1,6 @@
 <template>
   <div class="wrapper-blog" v-if="getDynamicPageContent && getDynamicPageContent.components && getDynamicPageContent.components.middle">
     <!-- Hero Section Start -->
-    <div class="knowledge-point">
-      <router-link to="#">
-        <span class="knowledge-text">Knowledge points</span>
-        <i class="icon-ribbon"></i>
-      </router-link>
-    </div>
 
       <div v-for="(item, label, idx) in getDynamicPageContent.components.middle" :key="idx">
         <component :is="label.replaceAll('_','-')" :content="item"></component>

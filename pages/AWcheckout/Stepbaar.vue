@@ -19,25 +19,27 @@
               <img src="/meccabook/logo.svg" alt="logo" title="logo" />
             </a>
             <div class="code-price d-flex align-items-center">
-              <span @click="toggleCheckoutModal" class="apply-txt">Appy code</span>
+              <span @click="toggleCheckoutModal" class="apply-txt">Apply code</span>
               <div class="cart-drpdwn">
                 <i class="cart-icn"
                   ><img src="/meccabook/icon-cart.svg" alt="icon"
                 /></i>
                 <select>
-                  <option>{{ $n(totals.total, "currency") }}</option>
+                  <option>${{ !donationValue ? parseFloat(totals.total) : parseFloat(donationAmount) + parseFloat(mainTotal) }}</option>
                 </select>
               </div>
             </div>
           </div>
           <ul class="steps-list d-flex justify-content-between">
-            <li @click="changeStep(1)" :class="shippingClass()">1. Shipping</li>
-            <li @click="changeStep(2)" :class="deliveryClass()">2. Delivery</li>
-            <li @click="changeStep(3)" :class="paymentClass()">3. Payment</li>
+            <li :class="shippingClass()">1. Shipping</li>
+            <li :class="deliveryClass()">2. Delivery</li>
+            <!-- <li :class="billingClass()">3. Billing</li> -->
+            <li :class="paymentClass()">3. Payment</li>
           </ul>
 
           <VsfShipping v-if="checkoutstep === 1" />
           <Delivery v-if="checkoutstep === 2" />
+          <!-- <Billing v-if="checkoutstep === 3" /> -->
           <Payment v-if="checkoutstep === 3" />
         </div>
       </div>
@@ -47,11 +49,12 @@
 </template>
 
 <script>
-import { useUiState, useUiNotification } from "~/composables";
+import { useUiState } from "~/composables";
 import Shipping from "./Shipping.vue";
 import Delivery from "./Delivery.vue";
 import Payment from "./Payment.vue";
 import VsfShipping from "./VsfShipping.vue";
+import Billing from "./Billing.vue";
 import {
   cartGetters,
   useCart,
@@ -64,12 +67,29 @@ export default {
         Shipping,
         Delivery,
         Payment,
-        VsfShipping
+        VsfShipping,
+        Billing
     },
     data() {
         return {
             selectedValue: 'shipping',
+            donationValue: false,
+            donationAmount: null
         }
+    },
+    props: {
+      mainTotal: {
+        type: Number,
+        default: null
+      }
+    },
+    mounted() {
+
+    if(localStorage.getItem('donationAmount') != null) {
+      this.donationValue = true;
+      this.donationAmount = parseFloat(localStorage.getItem('donationAmount'));
+    }
+
     },
     methods: {
         selectEvent(val) {
@@ -90,33 +110,38 @@ export default {
             else if (this.checkoutstep > 2) {
               return 'checked';
             }
-
+        },
+        billingClass() {
+            if(this.checkoutstep == 4){
+                return 'active';
+            }
+            else if (this.checkoutstep > 4) {
+              return 'checked';
+            }
         },
         paymentClass() {
             if(this.checkoutstep == 3){
                 return 'active';
             }
-
         },
     },
     setup() {
     const {  toggleCheckoutModal, checkoutstep, changeStep } = useUiState();
     const {
       cart,
-      removeItem,
-      updateItemQty,
       load: loadCart,
       loading,
     } = useCart();
-
+    const selectedShippingMethod = computed(() =>
+      cartGetters.getSelectedShippingMethod(cart.value)
+    );
     const totals = computed(() => cartGetters.getTotals(cart.value));
-
-
     return {
         toggleCheckoutModal,
         checkoutstep,
         changeStep,
         totals,
+        selectedShippingMethod
     }
     }
 }
@@ -126,7 +151,6 @@ export default {
 .appear {
     display: none;
 }
-
 .not-appear {
     display: block;
 }

@@ -16,12 +16,6 @@
           </div>
         </div>
       </div>
-      <div class="knowledge-point">
-        <a href="#">
-          <span class="knowledge-text">Knowledge points</span>
-          <i class="icon-ribbon"></i>
-        </a>
-      </div>
     </section>
     <section class="categories"
      :style="$route.path.includes('kids') ? 'background-image: url(/meccabook/kids-bg-img.png)' : 'background-image: url()'"
@@ -49,95 +43,11 @@
                 <LazyHydrate when-visible>
                   <CategorySidebarMenu :no-fetch="true" />
                 </LazyHydrate>
-                <div class="filter_holder">
-                <div class="filters desktop-only">
-                  <h2 class="fl-title">Filter by</h2>
-                  <AwAccordion>
-
-                  <div
-                    v-for="(facet, i) in facets"
-                    :key="i"
-                  >
-                  
-                    <SfHeading
-                      :key="`filter-title-${facet.id}`"
-                      :level="4"
-                      :title="facet.label"
-                      class="filters__title sf-heading--left"
-                    />
-                    <AwAccordionItem>
-                    <div v-if="facet.id === 'price'">
-                      <SfRadio
-                        v-for="option in facet.options"
-                        :key="`${facet.id}-${option.value}`"
-                        :label="`${option.id}${option.count ? ` (${option.count})` : ''}`"
-                        :value="option.value"
-                        :selected="isFilterSelected(facet, option)"
-                        name="priceFilter"
-                        @change="() => selectFilter(facet, option)"
-                      />
-                    </div>
-                    <div v-else>
-                      <SfFilter
-                        v-for="option in facet.options"
-                        :key="`${facet.id}-${option.value}`"
-                        :label="option.id + `${option.count ? ` (${option.count})` : ''}`"
-                        :selected="isFilterSelected(facet, option)"
-                        class="filters__item"
-                        @change="() => selectFilter(facet, option)"
-                      />
-                    </div>
-                    </AwAccordionItem>
-                  </div>
-                  </AwAccordion>
-                </div>
-
-              <SfAccordion class="filters smartphone-only">
-                <div
-                  v-for="(facet, i) in facets"
-                  :key="i"
-                >
-                  <SfAccordionItem
-                    :key="`filter-title-${facet.id}`"
-                    :header="facet.label"
-                    class="filters__accordion-item"
-                  >
-                    <SfFilter
-                      v-for="option in facet.options"
-                      :key="`${facet.id}-${option.id}`"
-                      :label="option.id"
-                      :selected="isFilterSelected(facet, option)"
-                      class="filters__item"
-                      @change="() => selectFilter(facet, option)"
-                    />
-                  </SfAccordionItem>
-                </div>
-              </SfAccordion>
-              <template>
-                <div class="filters__buttons wrap">
-                  <SfButton
-                    class="btn banner-btn"
-                    @click="applyFilters()"
-                  >
-                    <span>{{ $t('Done') }}</span>
-                  </SfButton>
-                  <SfButton
-                    class="btn continue-btn"
-                    @click="applyFilters({})"
-                  >
-                   <span> {{ $t('Clear all') }}</span>
-                  </SfButton>
-                </div>
-              
-              
-              </template>
-
-              </div>
               </div>
             </div>
           </div>
           <div class="col-xl-9 col-lg-12">
-            <div class="filters-wrap ml-xl-4">
+            <div class="filters-wrap">
               <div class="filter-left">
                 <div class="view-btns">
                 <div class="prev-page">
@@ -223,7 +133,7 @@
               </div>
                 
               <div class="filter-right">
-                <div class="page-details">
+                <div class="page-details" v-if="getSignedBooks && getSignedBooks[0]">
                   <p>
                     {{
                         'Showing ' + rangeOfItemsShown + ' of ' + (getSignedBooks[0].data).length + ' items'

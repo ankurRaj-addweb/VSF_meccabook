@@ -15,7 +15,6 @@
         @keyup.enter="$emit('keyup.enter', $event.target.value)"
         @keyup="$emit('keyup', $event)"
       >
-      <!-- <label>{{ placeholder }}</label> -->
     </div>
     <ValidationMessages v-if="validations" :validations="validations" />
   </div>

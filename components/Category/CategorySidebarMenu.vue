@@ -25,10 +25,11 @@
             :key="j"
             class="list__item"
           >
-            <template v-if="!excludeCategory.includes(subCat.uid[0])">
+            <template>
               <AwAccordion
                 :open="activeCategory"
                 :show-chevron="true"
+                v-if="subCat.items.length > 0"
               >
                 <AwMenuItem
                   :count="subCat.count || ''"
@@ -62,6 +63,19 @@
                 </AwMenuItem>
                 </AwAccordionItem>
               </AwAccordion>
+              <AwMenuItem
+                  :count="subCat.count || ''"
+                  :label="subCat.label" v-else>
+
+                <template #label="{ label }">
+                  <nuxt-link
+                    :to="localePath(th.getAgnosticCatLink(subCat))"
+                    :class="subCat.isCurrent ? 'sidebar--cat-selected' : ''"
+                  >
+                    {{ label }}
+                  </nuxt-link>
+                </template>
+                </AwMenuItem>
             </template>
           </AwListItem>
         </AwList>

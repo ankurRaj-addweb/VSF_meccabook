@@ -14,50 +14,58 @@
    return (this.onSale === true || this.newArrival === true || this.lessStock === true);
    },
    badgeText: function() {
-   
+
    if(this.lessStock === true) {
    this.badgeClass = 'less_stock';
    return 'Out of Stock';
    }
-   
-   
+
+
    if(this.newArrival === true) {
    this.badgeClass = 'new_arrival';
    return 'New';
    }
-   
-   
+
+
    if(this.onSale === true) {
    this.badgeClass = 'on_sale';
    return 'Sale';
    }
-   
-   
+
+
    }
    },
    mounted() {
    this.onSale = (this.price.special != null && this.price.special < this.price.regular);
-   
-   let latest = this.latest[0].data;
+    console.log(this.latest);
+    let latest = [];
+    if(typeof(this.latest) !== "undefined" && this.latest !== null) {
+      latest = this.latest[0].data;
+    }
+
    let that = this;
-   
+
    let matched = [];
-   
-   for(let i=0; i<15; i++) {
-   if(latest[i].product_id_base64 == that.product) {
-   matched.push(that.product);
-   }
-   }
-   
+
+if(latest.length > 0) {
+  for(let i=0; i<15; i++) {
+    if(latest[i].product_id_base64 == that.product) {
+      matched.push(that.product);
+    }
+  }
+}
+
+
+
    if(matched.length > 0) {
    this.newArrival = true;
    }
-   
+
    if(this.stockLeft > 0) {
    this.lessStock = true;
    }
-   
-   
+
+
    },
    data() {
    return {

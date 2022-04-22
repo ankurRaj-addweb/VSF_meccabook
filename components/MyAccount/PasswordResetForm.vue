@@ -1,26 +1,21 @@
 <template>
   <ValidationObserver v-slot="{ handleSubmit, reset }">
-    <form
-      class="form"
-      @submit.prevent="handleSubmit(submitForm(reset))"
-    >
+    <form class="form" @submit.prevent="handleSubmit(submitForm(reset))">
       <ValidationProvider
         v-slot="{ errors }"
         rules="required"
         class="form__element"
       >
-       <div class="sign-input-wrap">
-        <label>Current Password</label>
-        <input
-          v-model="form.currentPassword"
-          type="password"
-          name="currentPassword"
-          class="form-control"
-          required
-          :valid="!errors[0]"
-          :error-message="errors[0]"
-        />
-       </div>
+        <div class="sign-input-wrap">
+          <AwInput
+            v-model="form.currentPassword"
+            type="password"
+            name="currentPassword"
+            label="Current Password"
+            :valid="!errors[0]"
+            :error-message="errors[0]"
+          />
+        </div>
       </ValidationProvider>
       <div class="form__horizontal">
         <ValidationProvider
@@ -29,55 +24,52 @@
           vid="password"
           class="form__element"
         >
-        <div class="sign-input-wrap">
-          <label>New Password</label>
-          <input
-            v-model="form.newPassword"
-            type="password"
-            name="newPassword"
-            class="form-control"
-            required
-            :valid="!errors[0]"
-            :error-message="errors[0]"
-          />
-        </div>
+          <div class="sign-input-wrap">
+            <AwInput
+              v-model="form.newPassword"
+              type="password"
+              name="newPassword"
+              label="New Password"
+              :valid="!errors[0]"
+              :error-message="errors[0]"
+            />
+          </div>
         </ValidationProvider>
         <ValidationProvider
           v-slot="{ errors }"
           rules="required|confirmed:password"
           class="form__element"
         >
-        <div class="sign-input-wrap">
-          <label>Repeat Password</label>
-          <input
-            v-model="form.repeatPassword"
-            type="password"
-            name="repeatPassword"
-            class="form-control"
-            required
-            :valid="!errors[0]"
-            :error-message="errors[0]"
-          />
-        </div>
+          <div class="sign-input-wrap">
+            <AwInput
+              v-model="form.repeatPassword"
+              type="password"
+              name="repeatPassword"
+              label="Repeat Password"
+              :valid="!errors[0]"
+              :error-message="errors[0]"
+            />
+          </div>
         </ValidationProvider>
       </div>
       <button class="btn CartBtn">
-        <span>{{ $t('Update password') }}</span>
+        <span>{{ $t("Update password") }}</span>
       </button>
     </form>
   </ValidationObserver>
 </template>
 
 <script>
-import { defineComponent, ref } from '@nuxtjs/composition-api';
-import { ValidationProvider, ValidationObserver } from 'vee-validate';
-import { SfInput, SfButton } from '@storefront-ui/vue';
-import { useUiNotification } from '~/composables';
-
+import { defineComponent, ref } from "@nuxtjs/composition-api";
+import { ValidationProvider, ValidationObserver } from "vee-validate";
+import { SfInput, SfButton } from "@storefront-ui/vue";
+import { useUiNotification } from "~/composables";
+import AwInput from "../../pages/AwComponents/atoms/AwInput.vue";
 export default defineComponent({
-  name: 'PasswordResetForm',
+  name: "PasswordResetForm",
 
   components: {
+    AwInput,
     SfInput,
     SfButton,
     ValidationProvider,
@@ -86,13 +78,11 @@ export default defineComponent({
 
   setup(_, { emit }) {
     const resetForm = () => ({
-      currentPassword: '',
-      newPassword: '',
-      repeatPassword: '',
+      currentPassword: "",
+      newPassword: "",
+      repeatPassword: "",
     });
-    const {
-      send: sendNotification,
-    } = useUiNotification();
+    const { send: sendNotification } = useUiNotification();
 
     const form = ref(resetForm());
 
@@ -100,28 +90,32 @@ export default defineComponent({
       const onComplete = () => {
         form.value = resetForm();
         sendNotification({
-          id: Symbol('password_updated'),
-          message: 'The user password was changed successfully updated!',
-          type: 'success',
-          icon: 'check',
+          id: Symbol("password_updated"),
+          message: "The user password was changed successfully updated!",
+          type: "success",
+          icon: "check",
           persist: false,
-          title: 'User Account',
+          title: "User Account",
         });
         resetValidationFn();
       };
 
       const onError = () => {
         sendNotification({
-          id: Symbol('password_not_updated'),
-          message: 'It was not possible to update your password.',
-          type: 'danger',
-          icon: 'cross',
+          id: Symbol("password_not_updated"),
+          message: "It was not possible to update your password.",
+          type: "danger",
+          icon: "cross",
           persist: false,
-          title: 'User Account',
+          title: "User Account",
         });
       };
 
-      emit('submit', { form, onComplete, onError });
+      emit("submit", { form, onComplete, onError });
+      console.log("hi");
+      console.log(resetForm());
+      console.log(form.value.currentPassword);
+      console.log("bye");
     };
 
     return {

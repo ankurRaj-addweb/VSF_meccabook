@@ -11,7 +11,6 @@
               <li class="breadcrumb-item active" aria-current="page">
                 Donations
               </li>
-              <!-- <li>{{ getDonationsMagento }}</li> -->
             </ol>
           </div>
         </div>
@@ -32,20 +31,19 @@
                 class="donation-area"
                 v-if="
                   getDonationsMagento &&
-                  getDonationsMagento[0].data[0].order_data[0]
+                  getDonationsMagento[0].data
                 "
               >
                 <div class="total-donation">
                   <span class="do-price">{{
                     getDonationsMagento[0].data[1].donation_amount
                   }}</span>
-                  <p class="txt-desc">
-                    {{ getDonationsMagento[0].data[1].donation_text }}
+                  <p class="txt-desc" v-html="getDonationsMagento[0].data[2].donation_text">
                   </p>
                 </div>
                 <div class="donation-map d-none d-md-block">
                   <img :src="countryImageChange()" alt="map" class="map" />
-                  <div class="location-card d-flex align-items-center">
+                  <div class="location-card d-flex align-items-center" :class="applyClass ? 'image-fade' : '' ">
                     <div
                       class="loc-view"
                       v-if="
@@ -117,7 +115,7 @@
                     .title_description_crop_image[0].image"
                   :key="item.image"
                 >
-                  <img :src="item.image.url" :alt="item.image.alt" />
+                  <img class="img-donation" :src="item.image.url" :alt="item.image.alt" />
                 </li>
               </ul>
               <h6
@@ -166,7 +164,8 @@ export default {
   name: "Donations",
   data() {
     return {
-      countryName: null
+      countryName: null,
+      applyClass: false
     }
   },
   components: {
@@ -180,9 +179,8 @@ export default {
     countryImageChange() {
       if(this.getDonationsMagento[0] && this.getDonationsMagento[0].data[0] && this.getDonationsMagento[0].data[0].order_data[0].country) {
         this.countryName = this.getDonationsMagento[0].data[0].order_data[0].country;
-        // this.countryName = null;
         if(this.countryName) {
-        const imageURL = '/meccabook/'+this.countryName+'.png'; 
+        const imageURL = '/meccabook/country/'+this.countryName+'.svg'; 
         return imageURL;
         }
         else {
@@ -191,13 +189,19 @@ export default {
       }else {
         return "/meccabook/CharityMap-01.jpg"
       }
-      // return `'/meccabook/' ${getDonationsMagento[0].data[0].order_data[0].country} '.png'`;
     }
   },
   beforeMount() {
     this.fetchDonations();
     this.fetchDonationsMagento();
   },
+  mounted() {
+    window.addEventListener('scroll', () => {
+      if(window.scrollY > 40) {
+        this.applyClass = true
+      }
+    });
+  }
 };
 </script>
 
@@ -205,7 +209,6 @@ export default {
 @import "assets/css/base-components/mixin.scss";
 @import "assets/css/base-components/donation.scss";
 
-// @import "../css/base-components/donation.scss";
 .donation-area {
   padding: 24px 0 40px;
 }
@@ -244,13 +247,6 @@ export default {
   line-height: 1.4;
   margin-bottom: 0;
   font-family: "leksa", serif;
-}
-.txt-desc {
-  font-size: 1rem;
-  line-height: 1.4;
-  color: #2c354e;
-  margin-bottom: 15px;
-  margin: 0;
 }
 @media all and (min-width: 768px) {
   .txt-desc {
@@ -304,16 +300,29 @@ h2.info-title,
   }
 }
 
-p.desc {
-  font-size: 1rem;
-  line-height: 1.4;
-  margin-bottom: 14px;
-  color: #4b4c4d;
-  margin-bottom: 20px;
+@media all and (max-width: 767px) {
+  .img-donation { 
+    margin-bottom: 40px;
+  }  
 }
-@media all and (min-width: 992px) {
-  p.desc {
-    font-size: 1.125rem;
+.img-donation {
+  width: 188px;
+  height: 58px;
+}
+.location-card {
+  opacity: 0;
+}
+.image-fade {
+  animation: fadeIn ease-in 1;
+  animation-duration: 3s;
+  animation-fill-mode: forwards;
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
 </style>

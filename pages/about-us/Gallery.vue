@@ -17,8 +17,6 @@
             </div>
           </carousel>
         </div>
-
-        <i class="control prev d-none" @click="prevSlide"></i>
         <i class="control next" @click="nextSlide"></i>
       </div>
 
@@ -72,9 +70,6 @@ export default {
     nextSlide() {
       this.$refs.carousel.next();
     },
-    prevSlide() {
-      this.$refs.carousel.prev();
-    },
   },
   mounted() {
     this.screenWidth = window.innerWidth;
@@ -89,6 +84,14 @@ export default {
 .about-gallery-sec {
   h2 {
     margin-bottom: 30px;
+    @media all and (max-width: 767px) {
+      font-size: 26px;
+    }
+  }
+}
+section.about-gallery-sec.infoBlock-wrapSec.event-gallery {
+  @media all and (max-width: 767px) {
+    margin-top: 35px !important;
   }
 }
 .small-slide {
@@ -103,6 +106,14 @@ export default {
 }
 .grid-wrapper.gallery-item {
   justify-items: center;
+}
+
+.control {
+    position: absolute;
+    top: 50%;
+    width: 80px;
+    height: 80px;
+    z-index: 1;
 }
 </style>
 

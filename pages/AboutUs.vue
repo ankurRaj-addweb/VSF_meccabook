@@ -45,11 +45,19 @@
         :image="getAboutusContent.components.middle.image_title_description[0]"
       />
     </section>
-
     <!-- About Gallery Section Start -->
     <!-- timeline -->
     <section class="timeline-component">
-      <timeline></timeline>
+      <timeline 
+       v-if="
+          getrelandingPage &&
+          getrelandingPage.components &&
+          getrelandingPage.components.middle &&
+          getrelandingPage.components.middle.timeline_component
+        "
+          :timeline="getrelandingPage.components.middle.timeline_component"
+        >
+      </timeline>
     </section>
     <!-- <gallery /> -->
     <gallery
@@ -79,7 +87,6 @@
           class="advisors-wrap d-md-flex justify-content-between flex-wrap"
           :cards="getAboutusContent.components.middle.three_column_content"
         />
-
         <!-- <quote-slider /> -->
         <quote-slider
           v-if="
@@ -92,7 +99,6 @@
         />
       </div>
     </section>
-
     <!-- AboutBook -->
     <about-book
       v-if="getAboutusContent && getAboutusContent.components"
@@ -108,7 +114,8 @@
       <div class="container">
         <h4 class="followUs text-center">Follow us @MeccaBooks</h4>
       </div>
-      <follow-info></follow-info>
+      <!-- <follow-info></follow-info> -->
+      <div class="powr-instagram-feed" id="dd6f9094_1648207969"></div><script src="https://www.powr.io/powr.js?platform=vuejs"></script>
     </section>
   </div>
 </template>

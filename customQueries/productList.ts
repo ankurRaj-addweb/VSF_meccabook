@@ -67,6 +67,7 @@ export default gql`
           name
           url_suffix
           url_path
+          image
           breadcrumbs {
               category_name
               category_url_path

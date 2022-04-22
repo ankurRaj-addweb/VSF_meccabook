@@ -32,11 +32,7 @@
     }
 }
 
-.about-gallery-sec {
-    padding: 0 0 70px;
-    @media all and (min-width: 1200px) {
-        padding: 0 0 62px;
-    }
+.about-gallery-sec {    
     .container {
         overflow: inherit;
         @media all and (min-width: 1200px) {
@@ -164,7 +160,7 @@
 
 .aboutbook-sec {
     background: $beige;
-    padding: 41px 0 54px;
+    padding: 41px 0 0;
     @media all and (min-width: 768px) {
         background: none;
         padding: 70px 0;
@@ -189,6 +185,9 @@
         transform: translateY(-50%);
         min-height: 440px;
         height: 100%;
+        @media all and (max-width: 425px) {
+            display: none;
+        }
     }
 }
 

@@ -1,12 +1,6 @@
 <template>
   <div class="wrapper-blog">
     <!-- Hero Section Start -->
-    <div class="knowledge-point">
-      <router-link to="#">
-        <span class="knowledge-text">Knowledge points</span>
-        <i class="icon-ribbon"></i>
-      </router-link>
-    </div>
 
     <home-banner
       v-if="
@@ -48,7 +42,6 @@
                     .image.alt
                 "
               />
-              <!-- <img src="/meccabook/about-banner-mob.jpg" alt="image" /> -->
             </div>
             <p
               class="desc"
@@ -57,12 +50,6 @@
                   .description.text
               "
             >
-              <!-- {{
-                removeTags(
-                  getrelandingPage.components.middle.title_content_cta_image[0]
-                    .description.text
-                )
-              }} -->
             </p>
             <nuxt-link
               :to="
@@ -345,23 +332,21 @@
       <div class="container">
         <h4 class="followUs text-center">Follow us @MeccaBooks</h4>
       </div>
-      <follow-info></follow-info>
+      <!-- <follow-info></follow-info> -->
+      <div class="powr-instagram-feed" id="dd6f9094_1648207969"></div><script src="https://www.powr.io/powr.js?platform=vuejs"></script>
     </section>
   </div>
 </template>
 
 <script type="module">
-import { useProduct, productGetters } from "@vue-storefront/magento";
 import {
   computed,
-  defineComponent,
   ref,
   onMounted,
 } from "@nuxtjs/composition-api";
 import { mapActions, mapGetters } from "vuex";
 import FeatureBlock from "./Footer/FeatureBlock.vue";
 import Gallery from "./about-us/Gallery.vue";
-import { onSSR } from "@vue-storefront/core";
 import AboutBook from "./about-us/AboutBook.vue";
 import SeekerKnowledge from "../pages/home/SeekerKnowledge.vue";
 import QuoteSlider from "./about-us/QuotesSlider.vue";
@@ -395,7 +380,6 @@ export default {
   },
   data() {
     return {
-      contentFieldName: "getLatestArticle",
       carouselConfig: {
         infinite: true,
         centerMode: false,
@@ -405,33 +389,11 @@ export default {
         arrows: false,
         speed: 300,
       },
-      selectedTab: "featured",
-      selectedTab: "popular",
     };
   },
   setup() {
-    const carouselConfig = ref({
-      infinite: true,
-      centerMode: false,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      variableWidth: true,
-      arrows: false,
-      speed: 300,
-    });
-
     const screenWidth = ref(null);
-    const bannercarousel = ref(null);
     const prodcarousel = ref(null);
-    const eventcarousel = ref(null);
-
-    const next = () => {
-      bannercarousel.value.next();
-    };
-
-    const prev = () => {
-      bannercarousel.value.prev();
-    };
 
     const prevProduct = () => {
       prodcarousel.value.prev();
@@ -439,14 +401,6 @@ export default {
 
     const nextProduct = () => {
       prodcarousel.value.next();
-    };
-
-    const prevEvent = () => {
-      eventcarousel.value.prev();
-    };
-
-    const nextEvent = () => {
-      eventcarousel.value.next();
     };
 
     const productCarousel = computed(() => {
@@ -462,43 +416,26 @@ export default {
     });
 
     return {
-      carouselConfig,
-      next,
-      prev,
-      bannercarousel,
-      eventcarousel,
       screenWidth,
       productCarousel,
       prodcarousel,
       prevProduct,
       nextProduct,
-      prevEvent,
-      nextEvent,
     };
   },
   computed: {
     ...mapGetters("drupalcms", [
-      "getArticlesContent",
-      "getLatestArticle",
-      "getAboutusContent",
       "getrelandingPage",
       "getUpcomingEvents",
     ]),
   },
   methods: {
     ...mapActions("drupalcms", [
-      "fetchAboutus",
       "fetchlandingpage",
       "fetchUpcomingEvents",
     ]),
-    removeTags(str) {
-      if (str === null || str === "") return false;
-      else str = str.toString();
-      return str.replace(/(<([^>]+)>)/gi, "");
-    },
   },
   async mounted() {
-    await this.fetchAboutus();
     await this.fetchlandingpage();
     await this.fetchUpcomingEvents();
   },
@@ -609,17 +546,24 @@ export default {
 }
 .img-wrap {
   @media (min-width: 768px) {
-    max-width: 264px;
-    height: 264px;
+    height: 232px;
+      max-width: 232px;
     width: 100%;
   }
   img {
     @media (min-width: 768px) {
       height: 232px;
       max-width: 232px;
-      width: 100%;
+      width: 232px;
       object-fit: contain;
     }
   }
+}
+.viewImg {
+  margin-top: 51px;
+}
+.viewImg img {
+    width: 611px; 
+    height: 630px;
 }
 </style>

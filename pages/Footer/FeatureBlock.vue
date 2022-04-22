@@ -1,70 +1,38 @@
 <template>
   <div class="feature-block">
-  <div class="feature-wrap">
-    <div class="mr10">
-      <feature-icon />
+  <div class="feature-wrap"
+  v-for="item in freeshipping"
+  :key="item.image.url">
+    <div class="feature-icon">
+      <img class="feature-four-icons" :src="item.image.url" :alt="item.image.alt">
     </div>
     <div class="feature-info">
-      <h4>Free shipping</h4>
-      <p>Worldwide free shipping on all orders over $100.</p>
-    </div>
-  </div>
-  <div class="feature-wrap">
-    <div class="mr10">
-      <book-icon />
-    </div>
-    <div class="feature-info">
-      <h4>High quality books</h4>
-      <p>
-        Currated range of top quality products in both production
-        and content.
-      </p>
-    </div>
-  </div>
-  <div class="feature-wrap">
-    <div class="mr10">
-      <ribbon-icon />
-    </div>
-    <div class="feature-info">
-      <h4>Scholar validation</h4>
-      <p>
-        Key decisions evaluated by a panel of reputable Islamic
-        scholars.
-      </p>
-    </div>
-  </div>
-  <div class="feature-wrap">
-    <div class="mr10">
-      <payment-icon />
-    </div>
-    <div class="feature-info">
-      <h4>Easy payments</h4>
-      <p>
-        Fast and secure payments using a streamlined purchase
-        process
-      </p>
+      <h4>{{ item.title }}</h4>
+      <p v-html="item.description.text"></p>
     </div>
   </div>
   </div>
 </template>
 
 <script>
-import FeatureIcon from './FeatureIcon.vue'
-import BookIcon from './BookIcon.vue'
-import RibbonIcon from './RibbonIcon.vue'
-import PaymentIcon from './PaymentIcon.vue'
-
 export default ({
-  components: {
-      FeatureIcon,
-      PaymentIcon,
-      RibbonIcon,
-      BookIcon,
-  }
+  props: {
+    freeshipping: {
+      type: [Object, Array],
+      default: null
+    }
+  },
 })
 </script>
+
 <style lang="scss" scoped>
-// @import '~theme/css/variables/colors';
-// @import '~theme/css/helpers/functions/color';
-// $color-secondary: color(secondary);
+.feature-four-icons {
+    width: 24.04px;
+    height: 24px;
+    display: block;
+    max-width: 24.04px;
+}
+.feature-block {
+  margin-bottom: 0px;
+}
 </style>

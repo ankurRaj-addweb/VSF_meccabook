@@ -54,9 +54,6 @@ const config = convict({
     default: process.env.NUXT_APP_PORT || 3000,
     env: 'NUXT_APP_PORT',
   },
-  drupalCMS: {
-    articles_endpoint: "https://devmeccabooks.addwebprojects.com/api/article/list"
-    },
 });
 
 const env = config.get('env');

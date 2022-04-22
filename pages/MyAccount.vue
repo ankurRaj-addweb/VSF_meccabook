@@ -3,10 +3,6 @@
     <div class="container">
       <div class="row">
         <div class="col-">
-          <!-- <SfBreadcrumbs
-           class="breadcrumbs desktop-only"
-           :breadcrumbs="breadcrumbs"
-          /> -->
           <div class="breadcrumb-sec d-none d-md-block">
 					<div class="container">
 						<div class="breadcrumb-wrapper" aria-label="breadcrumb">
@@ -24,18 +20,6 @@
         :active="activePage"
         @click:change="changeActivePage"
       >
-      <!-- <SfContentCategory title="Personal Details"> -->
-        <!-- <SfContentPage title="My profile">
-          <MyProfile />
-        </SfContentPage>
-
-        <SfContentPage title="Addresses details">
-          <AddressesDetails />
-        </SfContentPage>
-
-        <SfContentPage title="My newsletter">
-          <MyNewsletter />
-        </SfContentPage> -->
 
             <AwContentPage title="Addresses details">
               <AddressesDetails />
@@ -46,29 +30,14 @@
             <AwContentPage title="Orders">
               <OrderHistory />
             </AwContentPage>
-            <!-- <AwContentPage title="Payment Methods">
-            </AwContentPage> -->
             <AwContentPage title="Wishlist">
             <MyWishlist />
             </AwContentPage>
-         
-      <!-- <SfContentCategory title="Order details">
-        <SfContentPage title="Order history">
-          <OrderHistory />
-        </SfContentPage>
-
-        <SfContentPage title="My reviews">
-          <MyReviews />
-        </SfContentPage>
-      </SfContentCategory> -->
-
-      <!-- <AwContentPage title="Log out" /> -->
     </AwContentPages>
     </div>
   </div>
 </template>
 <script>
-import { SfBreadcrumbs } from '@storefront-ui/vue';
 import {
   computed,
   defineComponent,
@@ -85,22 +54,17 @@ import {
 } from '@storefront-ui/vue/src/utilities/mobile-observer.js';
 import MyProfile from './MyAccount/MyProfile.vue';
 import AddressesDetails from './MyAccount/AddressesDetails.vue';
-import MyNewsletter from './MyAccount/MyNewsletter.vue';
 import MyWishlist from './MyAccount/MyWishlist.vue';
 import OrderHistory from './MyAccount/OrderHistory.vue';
-import MyReviews from './MyAccount/MyReviews.vue';
 import AwContentPages from '../pages/AwComponents/organisms/AwContentPages.vue'
 
 export default defineComponent({
   name: 'MyAccount',
   components: {
     AddressesDetails,
-    MyNewsletter,
     MyProfile,
-    MyReviews,
     MyWishlist,
     OrderHistory,
-    SfBreadcrumbs,
     AwContentPages,
   },
   middleware: [
@@ -162,13 +126,6 @@ export default defineComponent({
 </script>
 
 <style lang='scss' scoped>
-// #my-account {
-//   box-sizing: border-box;
-//   @include for-desktop {
-//     max-width: 1240px;
-//     margin: 0 auto;
-//   }
-// }
 .my-account {
   @include for-mobile {
     --content-pages-sidebar-category-title-font-weight: var(

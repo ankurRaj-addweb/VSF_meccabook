@@ -39,4 +39,7 @@ export default {
   text-align: center;
   max-width: 820px;
 }
+.sec-head.text-center {
+  margin-bottom: 45px;
+}
 </style>

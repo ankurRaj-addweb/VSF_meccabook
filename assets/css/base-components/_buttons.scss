@@ -169,7 +169,8 @@ button {
     margin-bottom: 10px;
     height: 56px;
     letter-spacing: 0.08em;
-    font-weight: $fw-regular;
+    font-weight: 400;
+    font-family: $primary-font;
     &.close-btn {
         background: $gold-light;
         img {
@@ -558,6 +559,8 @@ button.sf-button {
     -webkit-appearance: none;
     transition: all 0.3s ease-in-out !important;
     position: relative;
+    width: 250px;
+    height: 47px;
     span {
         color: inherit !important;
         font-size: inherit !important;
@@ -587,5 +590,81 @@ button.sf-button:focus,
     box-shadow: 0 2px 0 0 $gold;
     &:after {
         height: calc(100% + 2px) !important;
+    }
+}
+
+.cart-wrapper,
+.cart-item {
+    .sf-quantity-selector {
+        justify-content: center;
+        .sf-button--pure {
+            cursor: pointer;
+        }
+        .sf-input.sf-quantity-selector__input.has-text {
+            width: 44px;
+        }
+    }
+}
+
+button.sf-steps__step.sf-button--pure.sf-button {
+    background: none !important;
+    color: #2C354E !important;
+    box-shadow: none !important;
+    &::after {
+        content: none !important;
+    }
+    &:hover {
+        background: none !important;
+    }
+}
+
+.sf-modal__container {
+    padding-top: 30px;
+    button.sf-button--pure.sf-modal__close.desktop-only.sf-button {
+        background: transparent !important;
+        border-color: transparent !important;
+        box-shadow: unset !important;
+        width: 30px;
+        height: 30px;
+        right: 0;
+        top: 0;
+        position: absolute;
+        .sf-icon-path {
+            background: unset !important;
+        }
+    }
+    button.sf-button:after {
+        content: unset;
+    }
+}
+
+.stiky-onscroll.active-sticky {
+    .product__colors.desktop-only {
+        margin-top: 0px;
+        .box.box-btn {
+            margin-bottom: 0;
+            min-height: 60px;
+            height: 60px;
+            padding: 13px 14px;
+            span.quality.d-block {
+                font-size: 12px;
+            }
+            span.price.d-block {
+                font-size: 16px;
+            }
+        }
+        li.box.box-btn {
+            width: 85px;
+            min-width: 85px
+        }
+    }
+    button.btn.cart-btn.btn-larg-yello.text-uppercase {
+        min-height: 60px;
+    }
+}
+
+.pro-detail {
+    header.header.vue-fixed-header.vue-fixed-header--isFixed {
+        position: unset;
     }
 }

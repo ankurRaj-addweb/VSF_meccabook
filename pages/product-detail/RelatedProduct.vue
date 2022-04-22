@@ -12,8 +12,10 @@
                 v-for="(product, index) in getrelatedProduct.data"
                 :key="index"
                 class="col-md-3 col-sm-6 related-wrap category-wrap listcat-vw vrt-category"
+                @click="redirectToDetailPage(product)" 
               >
                 <div
+                  v-if="index < 4"
                   class="related-img category-img var-hor-category-img"
                   :class="breadcrumbs[0].text==='Kids' ? ('kidsbg' + (Math.floor(Math.random() * 8)+1)) : 'slider-img-bg'"
                 >
@@ -25,7 +27,7 @@
                     />
                   </div>
                 </div>
-                <div class="related-details text-center">
+                <div class="related-details text-center" v-if="index < 4">
                   <div v-if="product.product_name" class="category-name">
                     {{ product.product_name }}
                   </div>
@@ -35,11 +37,9 @@
                   <div class="price-wrap">${{ product.price }}</div>
                   <div class="rating">
                     <div class="ratings-wrap">
-                      <img
-                        src="/meccabook/ratings.png"
-                        alt="rating"
-                        title="rating"
-                      />
+                       <rating
+                        :rating="product.review"
+                      ></rating>
                     </div>
                   </div>
                 </div>
@@ -56,56 +56,72 @@
     >
       <div class="container">
         <h4 class="related-title text-center">Related products</h4>
-        <div class="related-slider" style="display: flex">
-          <div class="row">
-            <carousel
-              ref="carousel"
-              v-bind="carouselConfig"
-              :slidesToShow="1"
+        <div class="product-slider">
+        <div class="single-product-slider prod">
+        <carousel 
+          :arrows="false"
+          :asNavFor="$refs.minicarousel"
+          :slidesToShow="1"
+          ref="carousel"
+          :focusOnSelect="true"
+          :centerMode="true"
+        >
+          <div
+            v-for="(product, index) in getrelatedProduct.data"
+            :key="index"
+            class="col-md-3 col-sm-6 related-wrap category-wrap listcat-vw vrt-category"
+          >
+            <div class="related-img category-img var-hor-category-img"
+              :class="breadcrumbs[0].text==='Kids' ? ('kidsbg' + (Math.floor(Math.random() * 8)+1)) : 'slider-img-bg'"
+              @click="redirectToDetailPage(product)" 
             >
-              <div
-                v-for="(product, index) in getrelatedProduct.data"
-                :key="index"
-                class="col-md-3 col-sm-6 related-wrap category-wrap listcat-vw vrt-category"
-              >
-                <div
-                  class="related-img category-img var-hor-category-img"
-                  :class="breadcrumbs[0].text==='Kids' ? ('kidsbg' + (Math.floor(Math.random() * 8)+1)) : 'slider-img-bg'"
-                  @click="redirectToDetailPage(product)" 
-                >
-                  <div class="img-wrap">
-                    <img
-                      :src="product.product_image"
-                      alt="category"
-                      title="category"
-                    />
-                  </div>
-                </div>
-                <div class="related-details text-center"
-                    @click="redirectToDetailPage(product)" >
-                  <div v-if="product.product_name" class="category-name">
-                    {{ product.product_name }}
-                  </div>
-                  <div v-if="product.author_name" class="category-info">
-                    {{ product.author_name }}
-                  </div>
-                  <div class="price-wrap">${{ product.price }}</div>
-                  <div class="rating">
-                    <div class="ratings-wrap">
-                      <img
-                        src="/meccabook/ratings.png"
-                        alt="rating"
-                        title="rating"
-                      />
-                    </div>
-                  </div>
+              <div class="img-wrap vs-hr-imgwrap">
+                <img 
+                  :src="product.product_image"
+                  alt="category"
+                  title="category"
+                />
+              </div>
+            </div>
+          </div> 
+           </carousel>
+        </div>  
+        <div>
+          <carousel
+            :arrows="false"
+            :asNavFor="$refs.carousel"
+            ref="minicarousel"
+            :slidesToShow="1"
+            :focusOnSelect="true"
+          >
+          <div
+            v-for="(product, index) in getrelatedProduct.data"
+            :key="index"
+            >
+            <div class="container">
+            <div class="related-details text-center"
+              @click="redirectToDetailPage(product)" 
+            >
+              <div v-if="product.product_name" class="category-name">{{ product.product_name }}</div>
+              <div v-if="product.author_name" class="category-info">{{ product.author_name }}</div>
+              <div v-if="product.price" class="price-wrap">{{ product.price }}</div>
+              <div class="rating">
+                <div class="ratings-wrap">
+                    <rating
+                    :rating="product.review"
+                  ></rating>
                 </div>
               </div>
-            </carousel>
-            <i class="control prev" @click="prevSlide"></i>
-            <i class="control next" @click="nextSlide"></i>
+            </div>
+            </div>
           </div>
+          </carousel>
+          <i class="small-thumb-prev control prev" @click="prevSlide"></i>
+          <i class="small-thumb-next control next" @click="nextSlide"></i>
         </div>
+        </div>
+          <i class="control prev" @click="prevSlide"></i>
+          <i class="control next" @click="nextSlide"></i>
       </div>
     </section>
   </div>
@@ -117,6 +133,7 @@ import Carousel from "vue-slick-carousel";
 import "vue-slick-carousel/dist/vue-slick-carousel.css";
 import { ref, useRouter } from "@nuxtjs/composition-api";
 import { useUiState } from "~/composables";
+import Rating from "~/components/Products/Rating";
 
 export default {
   props: {
@@ -131,6 +148,7 @@ export default {
   },
   components: {
     Carousel,
+    Rating
   },
   computed: {
     ...mapGetters("drupalcms", ["getrelatedProduct"]),
@@ -139,13 +157,21 @@ export default {
     ...mapActions("drupalcms", ["fetchRelatedProduct"]),
     nextSlide() {
       this.$refs.carousel.next();
+      this.$refs.minicarousel.next();
     },
     prevSlide() {
       this.$refs.carousel.prev();
+      this.$refs.minicarousel.prev();
     },
   },
   mounted() {
     this.fetchRelatedProduct(this.productsku);
+  },
+  beforeMount() {
+    document.body.classList.add('pro-detail');
+  },
+  beforeDestroy() {
+    document.body.classList.remove('pro-detail');
   },
   setup() {
     const carouselConfig = ref({
@@ -231,7 +257,6 @@ export default {
 
 .var-hor-category-img {
     height: 263px !important;
-    // height: 100%;
     max-width: 100%;
     display: flex;
     align-items: center;
@@ -239,25 +264,72 @@ export default {
    @media all and (max-width: 575px) {
      height: 182px !important;
      max-width: 184px;
+     margin: 0 auto;
     }
 }
 
 .vs-hr-imgwrap {
   object-fit: cover;
-    img {
-        max-width: 232px;
-        max-height: 232px;
-        height: 100%;
-        width: 100%;
-        object-fit: contain;
+  img {
+      max-width: 232px;
+      max-height: 232px;
+      height: 100%;
+      width: 100%;
+      object-fit: contain;
     @media all and (max-width: 767px) {
         height: 145px !important;
         max-width: 145px;
-    }
+        margin: 0 auto;
+      }
     }
 }
 .ratings-wrap {
   display: flex;
   justify-content: center;
+}
+
+.small-thumb-prev.control.prev,
+.small-thumb-next.control.next {
+  opacity: 0;
+}
+i.small-thumb-next.control.next,
+i.small-thumb-prev.control.prev {
+  top: 100% !important;
+  margin-top: -15px !important;
+  padding: 6px;
+  border-radius: 4px;
+
+}
+.small-thumb-prev {
+  background: url(/meccabook/small-thumb-prev.png) no-repeat center center;
+  background-size: unset;
+  width: 3.75px;
+  height: 7.5px;
+  z-index: 9;
+}
+
+.small-thumb-next {
+  background: url(/meccabook/small-thumb-next.png) no-repeat center center;
+  background-size: unset;
+  z-index: 9;
+  width: 3.75px;
+  height: 7.5px;
+  right: 0;
+  transform: unset;
+}
+
+.control {
+  @media (max-width: 767px) {
+    top: 30% !important;
+  }
+  @media (max-width: 600px) {
+    top: 29% !important;
+  }
+}
+
+.category-wrap {
+  &.vrt-category {
+      margin-bottom: 0;
+  }
 }
 </style>

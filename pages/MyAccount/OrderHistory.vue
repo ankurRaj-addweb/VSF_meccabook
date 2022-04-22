@@ -8,13 +8,13 @@
         <SfLoader />
       </div>
       <div v-else-if="currentOrder">
-        <SfButton
+        <button
           data-cy="order-history-btn_orders"
           class="sf-button--text all-orders"
           @click="currentOrder = null"
         >
           All Orders
-        </SfButton>
+        </button>
         <div class="highlighted highlighted--total">
           <SfProperty
             name="Order ID"
@@ -102,20 +102,22 @@
               <span :class="getStatusTextClass(order)">{{ orderGetters.getStatus(order) }}</span>
             </SfTableData>
             <SfTableData class="orders__view orders__element--right">
-              <SfButton
+              <button
                 data-cy="order-history-btn_download"
-                class="sf-button--text smartphone-only"
+                class="back-link smartphone-only"
                 @click="downloadOrder(order)"
               >
                 {{ $t('Download') }}
-              </SfButton>
-              <SfButton
+              </button>
+              <div class="btn-wrap text-center">
+              <button
                 data-cy="order-history-btn_view"
-                class="sf-button--text desktop-only"
+                class="back-link desktop-only"
                 @click="currentOrder = order"
               >
-                {{ $t('View details') }}
-              </SfButton>
+                {{ $t('View') }}
+              </button>
+              </div>
             </SfTableData>
           </SfTableRow>
         </SfTable>
@@ -393,5 +395,13 @@ h2.sec-title {
     margin-bottom: 36px;
     font-weight: 600;
     color: #2C354E;
+}
+
+.back-link {
+  background: transparent;
+  color: #988146;
+  font-family: "leksa",serif;
+  letter-spacing: -0.035em;
+  text-decoration-line: underline;
 }
 </style>

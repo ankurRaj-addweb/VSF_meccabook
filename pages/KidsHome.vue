@@ -8,16 +8,9 @@
         getkidspage && getkidspage.components && getkidspage.components.middle
       "
     >
-     <div class="knowledge-point">
-        <a href="#">
-          <span class="knowledge-text">Knowledge points</span>
-          <i class="icon-ribbon"></i>
-        </a>
-      </div>
       <div class="container">
         <div class="kinds-banner-content">
-          <h1 class="kinds-bn-title">
-            {{ getkidspage.components.middle.image_title_description[0].title }}
+          <h1 class="kinds-bn-title" v-html="getkidspage.components.middle.image_title_description[0].title.replaceAll(' ','&nbsp')">
           </h1>
         </div>
       </div>
@@ -35,7 +28,6 @@
        <div class="kids-card-head">
           <template
           >
-            <!-- <nuxt-link to="/c/kids" > -->
             <div class="kids-img-card">
               <button v-if="getkidspage.components.middle.category_component[0].link"
                class="select-tab">
@@ -54,11 +46,9 @@
                 </div>
               </button>
             </div>
-            <!-- </nuxt-link> -->
           </template>
           <template
           >
-            <!-- <nuxt-link to="#" > -->
             <div class="kids-img-card">
               <button v-if="getkidspage.components.middle.category_component[1].link" 
                class="select-tab">
@@ -77,11 +67,9 @@
                 </div>
               </button>
             </div>
-            <!-- </nuxt-link> -->
           </template>
            <template
           >
-          <!-- <nuxt-link to="#" > -->
             <div class="kids-img-card">
               <button v-if="getkidspage.components.middle.category_component[2].link"
                class="select-tab">
@@ -100,11 +88,9 @@
                 </div>
               </button>
             </div>
-          <!-- </nuxt-link> -->
           </template>
           <template
           >
-            <!-- <nuxt-link to="#" > -->
             <div class="kids-img-card">
               <button :href="getkidspage.components.middle.category_component[3].link"
                class="select-tab">
@@ -123,7 +109,6 @@
                 </div>
               </button>
             </div>
-            <!-- </nuxt-link> -->
           </template>
       </div>
         <div
@@ -148,7 +133,7 @@
             getkidsfeatured &&
             getkidsfeatured[0].data &&
             getkidsPopular &&
-            getkidsPopular[0].data
+            getkidsPopular[0].model
           "
           :featured="getkidsfeatured"
           :popular="getkidsPopular"
@@ -160,7 +145,7 @@
             getkidsfeatured &&
             getkidsfeatured[0].data &&
             getkidsPopular &&
-            getkidsPopular[0].data
+            getkidsPopular[0].model
           "
           :featured="getkidsfeatured"
           :popular="getkidsPopular"
@@ -183,7 +168,6 @@
             <nuxt-link
             to="c/kids"
               class="btn"
-              v-if="this.showMoreButtonIsVisible"
             >
               <span>Show More</span>
               <i class="right-side-arrow"></i>
@@ -198,49 +182,16 @@
 <script>
 import Kidslatest from "../pages/kidshome/Kidslatest.vue";
 import { mapActions, mapGetters } from "vuex";
-import RouterLinkButton from "../components/RouterLinkButton.vue";
-import LatestArticleCard from "./articles/LatestArticleCard.vue";
-import { paginate } from "../mixins/paginatedContent.js";
-import {
-  onMounted,
-  useRoute,
-} from "@nuxtjs/composition-api";
 import FeaturedLatestPopular from "./home/FeaturedLatestPopular.vue";
 import FeaturedlatestPopularMobile from './home/FeaturedlatestPopularMobile.vue'
-
-import Carousel from "vue-slick-carousel";
-
 export default {
-  data() {
-    return {
-      contentFieldName: "getLatestArticle",
-      carouselConfig: {
-        infinite: true,
-        centerMode: false,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        variableWidth: true,
-        arrows: false,
-        speed: 300,
-      },
-      selectedTab: "featured",
-      kidsIndex: 0,
-      kidsLatest: 0,
-    };
-  },
   components: {
-    RouterLinkButton,
-    LatestArticleCard,
-    Carousel,
     FeaturedLatestPopular,
     FeaturedlatestPopularMobile,
     Kidslatest,
   },
-  mixins: [paginate],
   computed: {
     ...mapGetters("drupalcms", [
-      "getArticlesContent",
-      "getLatestArticle",
       "getkidspage",
       "getkidslatest",
       "getkidsfeatured",
@@ -249,7 +200,6 @@ export default {
   },
   methods: {
     ...mapActions("drupalcms", [
-      "fetchArticles",
       "fetchKids",
       "fetchKidslatest",
       "fetchKidsfeatured",
@@ -261,57 +211,18 @@ export default {
       else str = str.toString();
       return str.replace(/(<([^>]+)>)/gi, "");
     },
-
-    prevKn() {
-      this.$refs.kgcarousel.prev();
-      this.kidsIndex -= 5;
-    },
-    nextKn() {
-      this.$refs.kgcarousel.next();
-      this.kidsIndex += 5;
-    },
-
-    prevLKn() {
-      this.$refs.kgcarousel.prev();
-      this.kidsLatest -= 5;
-    },
-    nextLKn() {
-      this.$refs.kgcarousel.next();
-      this.kidsLatest += 5;
-    },
-    select(event, tabName) {
-      let navLinks = document.getElementsByClassName("nav-link");
-
-      for (let i = 0; i < navLinks.length; i++) {
-        navLinks[i].classList.remove("active");
-      }
-
-      let selectedElement = event.target;
-      selectedElement.classList.add("active");
-
-      this.selectedTab = tabName;
-    },
   },
-
-  setup() { 
-  const route = useRoute();
-  onMounted(() => {
-        document.body.classList.add('kids-home');
-  });
-  },
-
-  
 
   beforeMount() {
-    this.fetchArticles();
+    document.body.classList.add('kids-home');
+    this.fetchKids();
+    this.fetchKidslatest();
+    this.fetchKidsfeatured();
+    this.fetchKidspopular();
   },
-  async mounted() {
-    await this.fetchKids();
-    await this.fetchKidslatest();
-    await this.fetchKidsfeatured();
-    await this.fetchKidspopular();
+  beforeDestroy() {
+    document.body.classList.remove('kids-home');
   },
-  
 };
 </script>
 

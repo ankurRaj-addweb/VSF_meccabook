@@ -18,15 +18,24 @@
       <!-- articles-sec start -->
       <section class="articles-sec">
         <div class="container">
-          <!-- <h2 class="art-title pageInfo-title">Articles</h2> -->
-          <article-title v-if="getArticlesContent && getArticlesContent.title" :title="getArticlesContent.title" />
+          <article-title
+            v-if="getArticlesContent && getArticlesContent.title"
+            :title="getArticlesContent.title"
+          />
           <div class="row">
             <div class="col-12">
               <div class="wrap d-md-flex justify-content-between">
                 <router-link
-                  :to="'/article-detail/'+getArticlesContent.featured[0].node_id"
+                  :to="
+                    '/article-detail/' + getArticlesContent.featured[0].node_id
+                  "
                   class="move-pro-detail"
-                v-if="getArticlesContent && getArticlesContent.featured[0] && getArticlesContent.featured[0].node_id"></router-link>
+                  v-if="
+                    getArticlesContent &&
+                    getArticlesContent.featured[0] &&
+                    getArticlesContent.featured[0].node_id
+                  "
+                ></router-link>
                 <Main-article-image
                   v-if="
                     getArticlesContent && getArticlesContent.featured[0].image
@@ -89,7 +98,10 @@
         </div>
       </section>
       <div class="art-showmore-btn" v-if="getArticlesContent">
-        <div class="container" v-if="getArticlesContent.latest_article.length>8">
+        <div
+          class="container"
+          v-if="getArticlesContent.latest_article.length > 8"
+        >
           <div class="showmore-card-btn">
             <div class="show-more">
               <button
@@ -117,7 +129,6 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import RouterLinkButton from "../components/RouterLinkButton.vue";
 import ArticleTitle from "./articles/ArticleTitle.vue";
 import MainArticleImage from "./articles/MainArticleImage.vue";
 import ArticleText from "./articles/ArticleText.vue";
@@ -132,7 +143,6 @@ export default {
     };
   },
   components: {
-    RouterLinkButton,
     ArticleTitle,
     MainArticleImage,
     ArticleText,
@@ -161,7 +171,13 @@ export default {
 }
 .art-latest {
   .art-Card-wrap {
-      margin-bottom: 0px !important;
+    margin-bottom: 0px !important;
+      
+  }
+}
+.th-sec-title {
+  @media all and (max-width: 767px) {
+    margin-bottom: 20px;
   }
 }
 .th-sec-title {

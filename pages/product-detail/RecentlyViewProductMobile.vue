@@ -56,7 +56,7 @@
               <div v-if="product.price" class="price-wrap">{{ product.price }}</div>
               <div class="rating">
                 <div class="ratings-wrap">
-                  <img src="/meccabook/ratings.png" alt="rating" title="rating" />
+                  <rating :rating="product.rating"></rating>
                 </div>
               </div>
             </div>
@@ -78,10 +78,12 @@ import Carousel from "vue-slick-carousel";
 import "vue-slick-carousel/dist/vue-slick-carousel.css";
 import { useUiState } from "~/composables";
 import { useRouter } from "@nuxtjs/composition-api";
+import rating from "~/components/Products/Rating.vue";
 
 export default {
   components: {
     Carousel,
+    rating
   },
   data() {
     return {

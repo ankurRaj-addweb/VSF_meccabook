@@ -14,7 +14,7 @@
               <h6 class="pricing-st">{{ item.slogan }}</h6>
             </div>
             <div class="pricing-bot">
-              <div v-html="item.description"></div>
+              <div v-html="removeTags(item.description)"></div>
 
               <nuxt-link
                 :to="item.cta.url"
@@ -42,7 +42,7 @@ export default {
     removeTags(str) {
       if (str === null || str === "") return false;
       else str = str.toString();
-      return str.replace(/(<([^>]+)>)/gi, "");
+      return str.replace(/&nbsp;/g, ""); 
     },
   },
 };

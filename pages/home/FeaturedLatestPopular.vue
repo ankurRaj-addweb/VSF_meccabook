@@ -1,6 +1,5 @@
 <template>
   <section class="feature-products">
-    <!-- featured latest popular category desk-->
     <div class="tab-content d-none d-md-block" id="myTabContent">
       <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation" v-if="featuredData">
@@ -671,7 +670,7 @@
 
 <script type="module">
 import { computed, useRouter, ref } from "@nuxtjs/composition-api";
-import { useProduct, productGetters } from "@vue-storefront/magento";
+import { productGetters } from "@vue-storefront/magento";
 
 import Carousel from "vue-slick-carousel";
 import "vue-slick-carousel/dist/vue-slick-carousel.css";
@@ -698,35 +697,7 @@ export default {
     Carousel,
     Rating,
   },
-  data() {
-    return {
-      contentFieldName: "getLatestArticle",
-      carouselConfig: {
-        infinite: false,
-        centerMode: false,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        variableWidth: true,
-        arrows: false,
-        speed: 300,
-      },
-    };
-  },
-  methods: {
-    nextSlide() {
-      this.$refs.carousel.next();
-    },
-    prevSlide() {
-      this.$refs.carousel.prev();
-    },
-  },
   setup(props, context) {
-    const {
-      products: newProductsResult,
-      search: newProductsSearch,
-      loading: newProductsLoading,
-    } = useProduct("newProducts");
-    const bannercarousel = ref(null);
     const currentIndex = ref(0);
     const currentLatestIndex = ref(0);
     const currentPopularIndex = ref(0);
@@ -801,14 +772,14 @@ export default {
     const currentSetOfPopularImages = computed(() => {
       const startIndex = currentPopularIndex.value;
       const endIndex = startIndex + rotationFactor.value;
-      const images = popularData[0].data;
+      const images = popularData[0].model;
       const indexedImages = images.filter((img, idx) => {
         if (idx >= startIndex && idx <= endIndex - 1) {
           return img;
         }
       });
 
-      popularData[0].data.forEach((img) => {
+      popularData[0].model.forEach((img) => {
         img.isMain = false;
       });
 
@@ -857,7 +828,7 @@ export default {
 
     const isNextArrowVisiblePopular = computed(() => {
       return currentPopularIndex.value + rotationFactor.value >=
-        popularData[0].data.length
+        popularData[0].model.length
         ? false
         : true;
     });
@@ -872,21 +843,6 @@ export default {
       return currentPopularIndex.value >= rotationFactor.value ? true : false;
     });
 
-    // @ts-ignore
-    const newProducts = computed(() =>
-      productGetters.getFiltered(newProductsResult.value?.items, {
-        master: true,
-      })
-    );
-
-    const next = () => {
-      bannercarousel.value.next();
-    };
-
-    const prev = () => {
-      bannercarousel.value.prev();
-    };
-
     const selectImg = (product_image) => {
       const sI = featuredData[0].data.find(
         (img) => img.product_image === product_image
@@ -900,7 +856,7 @@ export default {
       selectedLatestImage.value = sI;
     };
     const selectPopularImg = (product_image) => {
-      const sI = popularData[0].data.find(
+      const sI = popularData[0].model.find(
         (img) => img.product_image === product_image
       );
       selectedPopularImage.value = sI;
@@ -919,24 +875,8 @@ export default {
       selectedTab.value = tabName;
     };
 
-    const carouselConfig = ref({
-      infinite: true,
-      centerMode: false,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      variableWidth: true,
-      arrows: false,
-      speed: 300,
-    });
-
     return {
-      newProducts,
-      newProductsLoading,
       productGetters,
-      carouselConfig,
-      next,
-      prev,
-      bannercarousel,
       currentSetOfImages,
       currentSetOfLatestImages,
       currentSetOfPopularImages,
@@ -1083,5 +1023,17 @@ export default {
 .knowledge-info {
   position: relative;
   cursor: pointer;
+}
+.event-next {
+  @media (min-width: 1200px) {
+    background: url(/meccabook/yellow-arrow.png) no-repeat center center;
+    transform: rotate(0deg) !important;
+  }
+}
+.event-prev {
+  @media (min-width: 1200px) {
+    background: url(/meccabook/yellow-arrow.png) no-repeat center center;
+    transform: rotate(180deg);
+  }
 }
 </style>

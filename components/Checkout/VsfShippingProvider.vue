@@ -51,7 +51,7 @@
           "
           @click="$emit('submit')"
         >
-         <span> {{ $t('Continueee') }} </span>
+         <span> {{ $t('Continue') }} </span>
         </SfButton>
       </div>
     </div>

@@ -1,8 +1,10 @@
+
 <template>
 		<div class="category-wrap listcat-vw vrt-category">
 		<!-- <img :src="d_product.image_url" alt class="result-card__image" /> -->
 		<div class="category-img mob-lt-hide var-hor-category-img">
-			<div class="img-wrp vs-hr-imgwrap">
+			<div class="img-wrp vs-hr-imgwrap" @click="redirectToDetailPage(d_product)">
+				<p v-if="d_product">{{d_product.image_url}}</p>
 			<img :src="d_product.image_url" alt class="" />
 			
 			</div>
@@ -41,66 +43,7 @@
 					<span class="btn-txt text-uppercase">view</span>
 				</button>
 				
-				<!-- <button
-					class="
-						btn
-						wishlist-btn
-						d-flex
-						align-items-center
-						justify-content-center
-					"
-					v-if="isAuthenticated"
-                	@click="addItem({ d_product })"
-				>
-					<svg
-						width="16"
-						height="20"
-						viewBox="0 0 16 20"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							fill-rule="evenodd"
-							clip-rule="evenodd"
-							d="M15 19.2987L8 14.2987L1 19.2987V3.29871C1 2.19414 1.89543 1.29871 3 1.29871H13C14.1046 1.29871 15 2.19414 15 3.29871V19.2987Z"
-							stroke="#ffffff"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						/>
-					</svg>
-					<span class="btn-txt text-uppercase">wishlist</span>
-					
-				</button>
-				<button
-					class="
-						btn
-						wishlist-btn
-						d-flex
-						align-items-center
-						justify-content-center
-					"
-					v-if="!isAuthenticated"
-                    @click="toggleLoginModal"
-				>
-					<svg
-						width="16"
-						height="20"
-						viewBox="0 0 16 20"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							fill-rule="evenodd"
-							clip-rule="evenodd"
-							d="M15 19.2987L8 14.2987L1 19.2987V3.29871C1 2.19414 1.89543 1.29871 3 1.29871H13C14.1046 1.29871 15 2.19414 15 3.29871V19.2987Z"
-							stroke="#ffffff"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						/>
-					</svg>
-					<span class="btn-txt text-uppercase">wishlist</span>
-				</button>
-				 -->
+				
 				<button
 					class="
 						btn
@@ -134,7 +77,7 @@
 			<div class="category-left">
 				<div class="category-name">{{ d_product.name }}</div>
 				<div class="category-info">
-					Shaykh Ahmad Ibn’Ajiba Al-Hasani
+					{{ d_product.author_3nd }}
 				</div>
 				<div class="price-wrap">
 					{{ d_product.price.USD.default_formated }}
@@ -142,9 +85,7 @@
         </div>
 		<!-- <p>{{isInWishlist({ d_product })}}</p> -->
 			<div class="rating">
-				<div class="ratings-wrap">
-					<img src="/meccabook/ratings.png" alt="rating" title="rating">
-					</div>
+				<rating :rating="d_product.rating_summary==''? 0: d_product.rating_summary"></rating>
 				</div>
 			</div>
 		</div>
@@ -155,10 +96,14 @@
 import { useUiState } from "~/composables";
 import { useRouter } from "@nuxtjs/composition-api";
 import { useUser, useWishlist } from "@vue-storefront/magento";
+import rating from "~/components/Products/Rating.vue";
 export default {
 	name: "ResultCard",
 	props: {
 		product: Object,
+	},
+	components: {
+		rating,
 	},
 	data() {
 		return {

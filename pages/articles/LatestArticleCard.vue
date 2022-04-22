@@ -3,7 +3,6 @@
     <router-link :to="'/article-detail/'+card.node_id" class="move-pro-detail"></router-link>
     <div v-if="card.image" class="art-card-view">
       <img :src="card.image.url" :alt="card.image.alt" />
-      <!-- <img src="/assets/meccabook/gallery-placeholder2.jpg" alt="image" /> -->
     </div>
     <div class="details art-details">
       <h3 v-if="card.title[0]" class="subtitle">
@@ -27,9 +26,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-      .art-details {
-        @media all and (max-width: 991px) {
-            padding-left: 20px !important;
-        }
-    }
+
+.artcard.card-wrao-info .art-card-view {
+  @media (max-width: 991px) {
+    width: unset !important;
+  } 
+  img {
+    @media (min-width: 768px) {
+      width: 100%;
+      max-width: 295px;
+      height: 200px;
+  } 
+  }
+}
 </style>

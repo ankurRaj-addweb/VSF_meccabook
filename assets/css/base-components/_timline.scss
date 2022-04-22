@@ -84,6 +84,7 @@
                     font-size: 36px;
                     color: #B69F62;
                     line-height: 50px;
+                    font-weight: 300;
                 }
                 p {
                     margin: 0;
@@ -93,9 +94,11 @@
                 }
             }
             .circle {
-                width: 88px;
+                width: 100%;
                 height: 88px;
                 border-radius: 50%;
+                object-fit: cover;
+                max-width: 88px;
             }
             &.topF {
                 padding-bottom: 25px;

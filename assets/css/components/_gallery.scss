@@ -8,7 +8,7 @@ $slider-height: 300px;
     position: relative;
     width: $slider-width;
     height: $slider-height;
-    z-index: 99;
+    z-index: 999;
 }
 
 .slides {
@@ -98,4 +98,8 @@ $slider-height: 300px;
     .slide {
         margin-block-end: 1rem;
     }
+}
+
+form#address-form\ p-0 {
+    z-index: 9999999999999999999;
 }

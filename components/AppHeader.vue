@@ -1,53 +1,23 @@
 <template>
   <div>
+    {{menu}}
     <SfHeader
       class="sf-header--has-mobile-search"
       :class="{'header-on-top': isSearchOpen}"
     >
       <!-- TODO: add mobile view buttons after SFUI team PR -->
-      <template #logo>
         <nuxt-link
           :to="localePath('/')"
           class="sf-header__logo"
         >
-          <SfImage
-            src="/icons/logo.svg"
-            alt="Vue Storefront Next"
-            class="sf-header__logo-image"
-          />
         </nuxt-link>
-      </template>
-      <template #navigation>
-        <div class="header-bottom navbar-collapse collapse" id="navbarToggle">
-          <ul class="navbar-nav main-menu">
-            <li v-for="(category, index) in categoryTree"
-              :key="index"
-              class="nav-item dropdown">
-              <nuxt-link
-          :to="category.slug"
-          class="sf-header__logo"
-              >
-          {{ category.label }}
-              </nuxt-link>
-            </li>
-
-            <li v-for="(category, index) in CSMpage"
-              :key="index"
-              class="nav-item dropdown">
-              <nuxt-link
-          :to="category.slug"
-          class="sf-header__logo"
-              >
-          {{ category.label }}
-              </nuxt-link>
-            </li>
-            
-          </ul>
-        </div>
-      </template>
-      <template #aside>
-        <LocaleSelector class="smartphone-only" />
-      </template>
+        <SfHeaderNavigationItem
+            v-for="(category, index) in categoryTree"
+            :key="index"
+            class="nav-item"
+            :label="category.label"
+            :link="category.slug"
+        />
       <template
         #header-icons="{activeIcon}"
       >
@@ -95,7 +65,7 @@
             v-e2e="'app-header-cart'"
             class="sf-button--pure sf-header__action"
             aria-label="Toggle cart sidebar"
-            @click="toggleCartSidebar"  
+            @click="toggleCartSidebar"
           >
             <SfIcon
               class="sf-header__icon"
@@ -112,6 +82,9 @@
               {{ cartTotalItems }}
             </SfBadge>
           </SfButton>
+        </div>
+        <div  class="Abhishek">
+          {{ menu }}
         </div>
       </template>
       <template #search>
@@ -173,7 +146,6 @@
 <script>
 import {
   SfHeader,
-  SfImage,
   SfIcon,
   SfButton,
   SfBadge,
@@ -192,10 +164,12 @@ import {
 import {
   computed,
   ref,
+  ssrRef,
   onBeforeUnmount,
   watch,
   defineComponent,
   useRouter,
+  useContext,
 } from '@nuxtjs/composition-api';
 import { onSSR } from '@vue-storefront/core';
 import { clickOutside } from '@storefront-ui/vue/src/utilities/directives/click-outside/click-outside-directive.js';
@@ -208,14 +182,11 @@ import {
   useUiHelpers,
   useUiState,
 } from '~/composables';
-import LocaleSelector from '~/components/LocaleSelector.vue';
 import SearchResults from '~/components/SearchResults.vue';
 
 export default defineComponent({
   components: {
     SfHeader,
-    SfImage,
-    LocaleSelector,
     SfIcon,
     SfButton,
     SfBadge,
@@ -226,10 +197,11 @@ export default defineComponent({
   directives: { clickOutside },
   setup() {
     const router = useRouter();
+    const { app } = useContext();
     const { toggleCartSidebar, toggleWishlistSidebar, toggleLoginModal } = useUiState();
     const { setTermForUrl, getFacetsFromURL, getAgnosticCatLink } = useUiHelpers();
     const { isAuthenticated, load: loadUser } = useUser();
-    const { cart, load: loadCart } = useCart();
+    const { cart } = useCart();
     const { wishlist } = useWishlist('GlobalWishlist');
     const {
       result: searchResult,
@@ -244,12 +216,11 @@ export default defineComponent({
       categories: categoryList,
       search: categoriesListSearch,
     } = useCategory('AppHeader:CategoryList');
-
     const term = ref(getFacetsFromURL().term);
     const isSearchOpen = ref(false);
     const searchBarRef = ref(null);
+    const menu = ssrRef(null);
     const result = ref(null);
-
     const wishlistHasProducts = computed(() => wishlistGetters.getTotalItems(wishlist.value) > 0);
     const wishlistItemsQty = computed(() => wishlistGetters.getTotalItems(wishlist.value));
 
@@ -260,29 +231,33 @@ export default defineComponent({
 
     const accountIcon = computed(() => (isAuthenticated.value ? 'profile_fill' : 'profile'));
 
-    const CSMpage = [{label: "Articles",slug: "/articles"},{label: "About us",slug: "/about-us"},{label: "contact",slug: "/contact-us"}]
     const categoryTree = computed(() => categoryGetters.getCategoryTree(categoryList.value?.[0])?.items.filter((c) => c.count > 0));
-    // const categoryTree = ["home","aboutUs"]
-
 
     const handleAccountClick = async () => {
       if (isAuthenticated.value) {
-        await router.push('/my-account');
+        await router.push(`${app.localePath('/my-account')}`);
       } else {
         toggleLoginModal();
       }
     };
 
+    const fetchMenu = async () => {
+      let data = await fetch(
+        'https://devmeccabooks.addwebprojects.com/api/menu'
+      ).then(res => res.json());
+
+      return data;
+    };
+
     onSSR(async () => {
       await Promise.all([
         loadUser(),
-        loadCart(),
         categoriesListSearch({
           pageSize: 20,
         }),
       ]);
+      menu.value = await fetchMenu();
     });
-
     const closeSearch = () => {
       if (!isSearchOpen.value) return;
 
@@ -330,7 +305,6 @@ export default defineComponent({
     const removeSearchResults = () => {
       result.value = null;
     };
-
     onBeforeUnmount(() => {
       unMapMobileObserver();
     });
@@ -339,7 +313,6 @@ export default defineComponent({
       accountIcon,
       cartTotalItems,
       categoryTree,
-      CSMpage,
       closeOrFocusSearchBar,
       closeSearch,
       getAgnosticCatLink,
@@ -357,14 +330,13 @@ export default defineComponent({
       toggleWishlistSidebar,
       wishlistHasProducts,
       wishlistItemsQty,
+      menu,
     };
   },
 });
 </script>
 
 <style lang="scss" scoped>
-@import "/assets/css/main.scss";
-
 .sf-header {
   --header-padding: var(--spacer-sm);
   @include for-desktop {

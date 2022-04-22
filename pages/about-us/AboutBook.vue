@@ -13,7 +13,6 @@
         />
 
         <base-button 
-          
           parentStyleClass="btn readmore-btn"
           :withIcon="false"
           :titleText="content.cta.label"
@@ -43,10 +42,6 @@ export default {
       type: [Object, Array],
       default: null,
     },
-    buttonLink: {
-      type: String,
-      default: null,
-    },
   },
   components: {
     BaseButton,
@@ -55,4 +50,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.about-info {
+  width: 578px;
+  height: 292px;
+  @media all and (max-width: 425px) {
+    position: relative !important;
+    overflow: visible;
+    width: 100%;
+    margin: 0 auto;
+  }
+}
 </style>

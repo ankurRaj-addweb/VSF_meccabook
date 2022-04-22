@@ -26,8 +26,8 @@ const useUiHelpers = () => {
 
   const getFacetsFromURL = () => ({
     filters: getFiltersDataFromUrl(true),
-    itemsPerPage: Number.parseInt(query.itemsPerPage as string, 10) || 10,
-    page: Number.parseInt(query.page as string, 10) || 1,
+    itemsPerPage: Number.parseInt(query.itemsPerPage as string, 10) || 12,
+    page: Number.parseInt(query.page as string, 12) || 1,
     sort: query.sort as string || '',
     term: query.term as string,
   });
@@ -38,7 +38,7 @@ const useUiHelpers = () => {
     page: Number.parseInt(query.page as string, 10) || 1,
     sort: query.sort || '',
     filters: getFiltersDataFromUrl(true),
-    itemsPerPage: Number.parseInt(query.itemsPerPage as string, 10) || 10,
+    itemsPerPage: Number.parseInt(query.itemsPerPage as string, 12) || 12,
     term: query.term,
   });
 
@@ -53,7 +53,7 @@ const useUiHelpers = () => {
     if(subCatName === null){
       return `/c/categories${removeDotHtml(category.slug)}`;
     }
-    return `/c/categories${removeDotHtml(subCatName.slug)}${removeDotHtml(category.slug)}`;
+    return `/c/categories${(removeDotHtml(category.slug).includes(removeDotHtml(subCatName.slug))) ? removeDotHtml(category.slug) : removeDotHtml(subCatName.slug)+removeDotHtml(category.slug)}`
   }
 
   const getAgnosticCatKidsLink = (category: AgnosticCategoryTree, subCatName = null) => {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Header />
+    <Header :magentoURL="$config.magentoURL" :drupalURL="$config.drupalURL" />
 
     <div id="layout">
       <nuxt :key="route.fullPath" />

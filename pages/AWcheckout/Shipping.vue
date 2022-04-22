@@ -1,8 +1,11 @@
 <template>
   <div class="shipping-popup-block">
     <CustomForm :is-new="true" @submit="saveAddress" class="customform-wrap"/>
+    <div>
+        <LoadingSpinner v-if="spinnerStatus" />
+    </div>
     <div class="btn-wrap text-center">
-        <button @click="toggleAddressForm" class="back-link" type="button">
+        <button v-if="!addressLengthIsZero" @click="toggleAddressForm" class="back-link" type="button">
           Back
         </button>
     </div>
@@ -10,8 +13,7 @@
 </template>
 
 <script>
-import { useUiState, useUiNotification } from "~/composables";
-import { SfHeading, SfInput, SfButton, SfSelect } from "@storefront-ui/vue";
+import { useUiState } from "~/composables";
 import {
   ref,
   computed,
@@ -28,52 +30,39 @@ import {
   useShipping,
   useUser,
   useUserShipping,
+  useUserBilling,
   userAddressesGetters,
   useAddresses,
 } from "@vue-storefront/magento";
-import { required, min, digits } from "vee-validate/dist/rules";
-import { ValidationProvider, ValidationObserver, extend } from "vee-validate";
 import { addressFromApiToForm } from "~/helpers/checkout/address";
-
+import LoadingSpinner from '../../components/LoadingSpinner.vue';
 import CustomForm from "~/components/MyAccount/CustomForm.vue";
 
 const NOT_SELECTED_ADDRESS = "";
 
-extend("required", {
-  ...required,
-  message: "This field is required",
-});
-extend("min", {
-  ...min,
-  message: "The field should have at least {length} characters",
-});
-extend("digits", {
-  ...digits,
-  message: "Please provide a valid phone number",
-});
-
 export default defineComponent({
   name: "ShippingStep",
   components: {
-    SfHeading,
-    SfInput,
     CustomForm,
-    SfButton,
-    SfSelect,
-    ValidationProvider,
-    ValidationObserver,
-    UserShippingAddresses: () =>
-      import("~/components/Checkout/UserShippingAddresses.vue"),
-    VsfShippingProvider: () =>
-      import("~/components/Checkout/VsfShippingProvider.vue"),
+    LoadingSpinner
+  },
+  props: {
+    addressLengthIsZero: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   setup() {
     const { load, loading, shipping: address } = useShipping();
     const {
       shipping: userShipping,
       load: loadUserShipping,
-      setDefaultAddress,
     } = useUserShipping();
+    const {
+      billing: userBilling,
+      load: loadUserBilling,
+    } = useUserBilling();
     const {
       load: loadCountries,
       countries,
@@ -87,23 +76,11 @@ export default defineComponent({
 
     const router = useRouter();
 
-    const shipFormDetail = ref({
-      email: null,
-      firstName: null,
-      lastName: null,
-      phone: null,
-      address1: null,
-      address2: null,
-      country: null,
-      state: null,
-      city: null,
-      zipcode: null,
-    });
-
     const setAsDefault = ref(false);
     const isFormSubmitted = ref(false);
     const canAddNewAddress = ref(true);
     const isNewaddress = ref(false);
+    const spinnerStatus = ref(false);
 
     const isShippingDetailsStepCompleted = ref(false);
     const { checkoutstep, nextStep, preStep,  newAddressform, toggleAddressForm, closeAddressform } = useUiState();
@@ -184,16 +161,18 @@ export default defineComponent({
     });
 
     const displayData = async () => {
-      // await save({ shippingDetails: shipFormDetail.value });
       nextStep();
     };
 
     const saveAddress = async ({ form, onComplete, onError }) => {
       try {
         const data = await save({ address: form });
+        spinnerStatus.value = true;
         await onComplete(data);
         await router.push({ path: "/checkout-cart/" });
         await loadUserShipping();
+        await loadUserBilling();
+        spinnerStatus.value = false;
         await closeAddressform();
         console.log("address save succesfully");
 
@@ -259,13 +238,13 @@ export default defineComponent({
       isNewaddress,
       preStep,
       nextStep,
-      shipFormDetail,
       displayData,
       saveAddress,
       userAddresses,
       newAddressform,
       toggleAddressForm,
-      closeAddressform
+      closeAddressform,
+      spinnerStatus
     };
   },
 });

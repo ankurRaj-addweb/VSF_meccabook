@@ -1,19 +1,26 @@
 <template>
   <div class="card-wrao-info art-midd-card">
     <div class="row">
-      <div class="col-md-5">
-        <router-link :to="'/article-detail/'+card.node_id" class="move-pro-detail"></router-link>
+      <div class="col-md-6">
+        <router-link
+          :to="'/article-detail/' + card.node_id"
+          class="move-pro-detail"
+        ></router-link>
         <div class="art-card-view">
           <img :src="card.image.url" :alt="card.image.alt" />
-          <!-- <img src="/assets/meccabook/gallery-placeholder1.jpg" alt="image" /> -->
         </div>
       </div>
       <div class="col-md-6 align-self-center">
-        <router-link :to="'/article-detail/'+card.node_id" class="move-pro-detail"></router-link>
+        <router-link
+          :to="'/article-detail/' + card.node_id"
+          class="move-pro-detail"
+        ></router-link>
         <div class="details art-details">
           <div class="date-address d-none d-md-block">
             <span class="date"> {{ formatCompat(card.date) }} </span>
-            <span class="address" v-for="(item,i) in card.tags" :key="i">{{ card.tags[i+1] ? item+"," : item }}</span>
+            <span class="address" v-for="(item, i) in card.tags" :key="i">{{
+              card.tags[i + 1] ? item + "," : item
+            }}</span>
           </div>
           <h3 class="subtitle">
             {{ card.title[0].value }}
@@ -33,14 +40,12 @@ export default {
       default: null,
     },
   },
-  methods:{
-     formatCompat(d3) {
-      var initial = ((d3.toString()).replace(/-/g, "/").split(/\//));
-      var t = [initial[1], initial[0], initial[2]].join("/");
-      var d = new Date(t);
-      var dd = String(d.getDate()).padStart(2, "0");
-      var mm = d.getMonth();
-      var ms = [
+  methods: {
+    formatCompat(d3) {
+      const initial = d3.toString().replace(/-/g, "/").split(/\//);
+      const t = [initial[1], initial[0], initial[2]].join("/");
+      const d = new Date(t);
+      const ms = [
         "January",
         "February",
         "March",
@@ -54,10 +59,13 @@ export default {
         "November",
         "December",
       ];
-      var yyyy = d.getFullYear();
-
-      d = ms[mm] + " " + dd  +"," + yyyy;
-      return d;
+      return (
+        ms[d.getMonth()] +
+        " " +
+        String(d.getDate()).padStart(2, "0") +
+        ", " +
+        d.getFullYear()
+      );
     },
   },
 };
@@ -65,11 +73,14 @@ export default {
 
 <style lang="scss" scoped>
 .art-midd-card {
-  .details.art-details  {
+  .details.art-details {
+    @media all and (min-width: 768px) {
+        margin-top: 23px;
+      }
     .desc {
-    @media all and (min-width: 1200px) {
-      margin-bottom: 0;
-     }
+      @media all and (min-width: 1200px) {
+        margin-bottom: 0;
+      }
     }
   }
 }
@@ -80,11 +91,11 @@ export default {
   padding-left: 0;
 }
 .art-midd-card {
-    img {
-      @media all and (max-width: 767px) {
-        width: 100%;
-        height: 188px;
-        object-fit: cover;
+  img {
+    @media all and (max-width: 767px) {
+      width: 100%;
+      height: 188px;
+      object-fit: cover;
     }
   }
 }

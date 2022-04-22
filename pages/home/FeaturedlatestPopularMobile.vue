@@ -82,11 +82,9 @@
                 >
                   <div class="container">
                     <div class="knowledge-info">
-                      <!-- <router-link :to="'p/'+img.product_id+'/'+img.product_name"> {{img}} -->
                       <h2 class="sec-title" @click="redirectToDetailPage(img)">
                         {{ img.product_name }}
                       </h2>
-                      <!-- </router-link> -->
                       <span
                         class="publisher"
                         @click="redirectToDetailPage(img)"
@@ -165,7 +163,7 @@
               >
                 <div
                   style="background-image: url()"
-                  v-for="(img, idx) in featuredData[0].data"
+                  v-for="(img, idx) in latestData[0].data"
                   :key="`${img.product_image}_${idx}`"
                 >
                   <div class="container">
@@ -228,7 +226,7 @@
                 ref="carousel"
               >
                 <div
-                  v-for="(img, idx) in popularData[0].data"
+                  v-for="(img, idx) in popularData[0].model"
                   :key="`${img.product_image}_${idx}`"
                   class="img-wrp"
                   :class="
@@ -256,7 +254,7 @@
               >
                 <div
                   style="background-image: url()"
-                  v-for="(img, idx) in popularData[0].data"
+                  v-for="(img, idx) in popularData[0].model"
                   :key="`${img.product_image}_${idx}`"
                 >
                   <div class="container">
@@ -304,8 +302,8 @@
 
 
 <script type="module">
-import { computed, ref, useRouter } from "@nuxtjs/composition-api";
-import { useProduct, productGetters } from "@vue-storefront/magento";
+import { ref, useRouter } from "@nuxtjs/composition-api";
+import { productGetters } from "@vue-storefront/magento";
 
 import Carousel from "vue-slick-carousel";
 import "vue-slick-carousel/dist/vue-slick-carousel.css";
@@ -332,16 +330,10 @@ export default {
     Carousel,
     Rating,
   },
-  data() {
-    return {
-      contentFieldName: "getLatestArticle",
-    };
-  },
   methods: {
     nextSlide() {
       this.$refs.carousel.next();
       this.$refs.minicarousel.next();
-
     },
     prevSlide() {
       this.$refs.carousel.prev();
@@ -349,183 +341,10 @@ export default {
     },
   },
   setup(props, context) {
-    const {
-      products: newProductsResult,
-      search: newProductsSearch,
-      loading: newProductsLoading,
-    } = useProduct("newProducts");
-    const bannercarousel = ref(null);
-    const currentIndex = ref(0);
-    const currentLatestIndex = ref(0);
-    const currentPopularIndex = ref(0);
-    const rotationFactor = ref(5);
-    const selectedImage = ref("");
-    const selectedLatestImage = ref("");
-    const selectedPopularImage = ref("");
     const featuredData = props.featured;
     const latestData = props.latest;
     const popularData = props.popular;
     const selectedTab = ref("featured");
-    const nextSetOfImages = () => {
-      currentIndex.value += rotationFactor.value;
-      selectedImage.value = null;
-    };
-    const nextSetOfLatestImages = () => {
-      currentLatestIndex.value += rotationFactor.value;
-      selectedLatestImage.value = null;
-    };
-    const nextSetOfPopularImages = () => {
-      currentPopularIndex.value += rotationFactor.value;
-      selectedPopularImage.value = null;
-    };
-
-    const prevSetOfImages = () => {
-      currentIndex.value -= rotationFactor.value;
-      selectedImage.value = null;
-    };
-    const prevSetOfLatestImages = () => {
-      currentLatestIndex.value -= rotationFactor.value;
-      selectedLatestImage.value = null;
-    };
-    const prevSetOfPopularImages = () => {
-      currentPopularIndex.value -= rotationFactor.value;
-      selectedPopularImage.value = null;
-    };
-
-    const currentSetOfImages = computed(() => {
-      const startIndex = currentIndex.value;
-      const endIndex = startIndex + rotationFactor.value;
-      const images = featuredData[0].data;
-      const indexedImages = images.filter((img, idx) => {
-        if (idx >= startIndex && idx <= endIndex - 1) {
-          return img;
-        }
-      });
-
-      featuredData[0].data.forEach((img) => {
-        img.isMain = false;
-      });
-
-      indexedImages[0].isMain = true;
-      return indexedImages;
-    });
-    const currentSetOfLatestImages = computed(() => {
-      const startIndex = currentLatestIndex.value;
-      const endIndex = startIndex + rotationFactor.value;
-      const images = latestData[0].data;
-      const indexedImages = images.filter((img, idx) => {
-        if (idx >= startIndex && idx <= endIndex - 1) {
-          return img;
-        }
-      });
-
-      latestData[0].data.forEach((img) => {
-        img.isMain = false;
-      });
-
-      indexedImages[0].isMain = true;
-      return indexedImages;
-    });
-    const currentSetOfPopularImages = computed(() => {
-      const startIndex = currentPopularIndex.value;
-      const endIndex = startIndex + rotationFactor.value;
-      const images = popularData[0].data;
-      const indexedImages = images.filter((img, idx) => {
-        if (idx >= startIndex && idx <= endIndex - 1) {
-          return img;
-        }
-      });
-
-      popularData[0].data.forEach((img) => {
-        img.isMain = false;
-      });
-
-      indexedImages[0].isMain = true;
-      return indexedImages;
-    });
-
-
-    const mainImage = computed(() => {
-      const mainImg = currentSetOfImages.value.find(
-        (img) => img.isMain === true
-      );
-      return mainImg;
-    });
-    const mainLatestImage = computed(() => {
-      const mainImg = currentSetOfLatestImages.value.find(
-        (img) => img.isMain === true
-      );
-      return mainImg;
-    });
-    const mainPopularImage = computed(() => {
-      const mainImg = currentSetOfPopularImages.value.find(
-        (img) => img.isMain === true
-      );
-      return mainImg;
-    });
-
-    const isNextArrowVisible = computed(() => {
-      return currentIndex.value + rotationFactor.value >=
-        featuredData[0].data.length
-        ? false
-        : true;
-    });
-    const isNextArrowVisibleLatest = computed(() => {
-      return currentLatestIndex.value + rotationFactor.value >=
-        latestData[0].data.length
-        ? false
-        : true;
-    });
-    const isNextArrowVisiblePopular = computed(() => {
-      return currentPopularIndex.value + rotationFactor.value >=
-        popularData[0].data.length
-        ? false
-        : true;
-    });
-
-    const isPrevArrowVisible = computed(() => {
-      return currentIndex.value >= rotationFactor.value ? true : false;
-    });
-    const isPrevArrowVisibleLatest = computed(() => {
-      return currentLatestIndex.value >= rotationFactor.value ? true : false;
-    });
-    const isPrevArrowVisiblePopular = computed(() => {
-      return currentPopularIndex.value >= rotationFactor.value ? true : false;
-    });
-
-    // @ts-ignore
-    const newProducts = computed(() =>
-      productGetters.getFiltered(newProductsResult.value?.items, {
-        master: true,
-      })
-    );
-
-    const next = () => {
-      bannercarousel.value.next();
-    };
-
-    const prev = () => {
-      bannercarousel.value.prev();
-    };
-
-    const selectImg = (product_image) => {
-      const sI = featuredData[0].data.find(
-        (img) => img.product_image === product_image
-      );
-      selectedImage.value = sI;
-    };
-    const selectLatestImg = (product_image) => {
-      const sI = latestData[0].data.find(
-        (img) => img.product_image === product_image
-      );
-      selectedLatestImage.value = sI;
-    };
-    const selectPopularImg = (product_image) => {
-      const sI = popularData[0].data.find(
-        (img) => img.product_image === product_image
-      );
-      selectedPopularImage.value = sI;
-    };
 
     const select = (event, tabName) => {
       let navLinks = document.getElementsByClassName("nav-link");
@@ -546,69 +365,9 @@ export default {
       router.push({ path: link });
     };
     const router = useRouter();
-
-    const carouselConfig = ref({
-      infinite: false,
-      centerMode: true,
-      centerPadding: "40%",
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      variableWidth: true,
-      arrows: false,
-      focusOnSelect: true,
-      speed: 300,
-      responsive: [
-        {
-          breakpoint: 767,
-          settings: {
-            centerPadding: "30%",
-          },
-        },
-        {
-          breakpoint: 500,
-          settings: {
-            slidesToShow: 1,
-            centerMode: true,
-          },
-        },
-      ],
-    });
-
+   
     return {
-      newProducts,
-      newProductsLoading,
       productGetters,
-      carouselConfig,
-      next,
-      prev,
-      bannercarousel,
-      currentSetOfImages,
-      currentSetOfLatestImages,
-      currentSetOfPopularImages,
-      nextSetOfImages,
-      nextSetOfLatestImages,
-      nextSetOfPopularImages,
-      prevSetOfImages,
-      prevSetOfLatestImages,
-      prevSetOfPopularImages,
-      mainImage,
-      mainLatestImage,
-      mainPopularImage,
-      isNextArrowVisible,
-      isNextArrowVisibleLatest,
-      isNextArrowVisiblePopular,
-      isPrevArrowVisible,
-      isPrevArrowVisibleLatest,
-      isPrevArrowVisiblePopular,
-      selectedImage,
-      selectedLatestImage,
-      selectedPopularImage,
-      currentIndex,
-      currentLatestIndex,
-      currentPopularIndex,
-      selectImg,
-      selectLatestImg,
-      selectPopularImg,
       featuredData,
       selectedTab,
       select,
@@ -653,7 +412,6 @@ export default {
 .feature-products {
   .tab-content {
     ul {
-      margin: 0 auto 24px;
       li {
         button {
           line-height: normal;

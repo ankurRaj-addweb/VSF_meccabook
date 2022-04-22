@@ -1,4 +1,5 @@
 import customProductsQuery from './customQueries/productList';
+import CategoryListQuery from './customQueries/categoryList';
 
 const config = require('./config.js');
 const cookieNames = require('./enums/cookieNameEnum');
@@ -32,9 +33,16 @@ module.exports = {
         },
       },
       customQueries: {
-        products: ({ query, variables }) => {
-          return { query: customProductsQuery, variables }; // Your custom query
-        },
+          /* This is where we override the default query */
+          products: (context) => ({ 
+            ...context,
+            query: customProductsQuery,  // Your custom query
+          }),
+          /* This is where we override the default query */
+          categoryList: (context) => ({ 
+            ...context,
+            query: CategoryListQuery,  // Your custom query
+          })
       },
     },
   },

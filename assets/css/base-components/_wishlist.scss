@@ -144,3 +144,9 @@
         color: $navy;
     }
 }
+
+@media (max-width: 991px) {
+    h3.d-none.block-title.d-lg-block {
+        display: block !important;
+    }
+}

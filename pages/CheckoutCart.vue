@@ -1,12 +1,6 @@
 <template>
   <div class="wrapper-blog">
     <div class="contact product-page">
-      <div class="knowledge-point">
-        <a href="#">
-          <span class="knowledge-text">Knowledge points</span>
-          <i class="icon-ribbon"></i>
-        </a>
-      </div>
       <div class="breadcrumb-sec d-none d-md-block">
         <div class="container">
           <div class="breadcrumb-wrapper" aria-label="breadcrumb">
@@ -64,7 +58,8 @@
                       </h4>
                       <p v-if="product.__typename == 'ConfigurableCartItem' " class="item-exp">{{ product.configurable_options[0].value_label }}</p>
                       <p class="sku-txt">SKU: {{ cartGetters.getItemSku(product) }}</p>
-                      <span class="instock">In Stock</span>
+                      <span v-if="product.product.stock_status == 'IN_STOCK' " class="instock">In Stock</span>
+                      <span v-else class="instock">Out of Stock</span>
                     </div>
                     <div
                       class="
@@ -82,7 +77,7 @@
                         }}</span>
                       </div>
                       <div class="included d-md-flex align-items-center">
-                        <SfQuantitySelector
+                        <AwQuantitySelector
                           :disabled="loading"
                           :qty="cartGetters.getItemQty(product)"
                           @input="updateItemQty({ product, quantity: $event })"
@@ -115,7 +110,7 @@
                 <span
                   >Subtotal <sub>({{ totalItems }} items)</sub></span
                 >
-                <span>{{ $n(totals.subtotal, "currency") }}</span>
+                <span>{{ $n(productPriceTotal, "currency") }}</span>
               </div>
               <div
                 class="
@@ -127,10 +122,8 @@
                 "
               >
                 <span>Estimated Shipping</span>
-                <span v-if="getShippingMethodPrice(selectedShippingMethod)">{{
-                  $n(getShippingMethodPrice(selectedShippingMethod), "currency")
-                }}</span>
-                <span v-else>$0</span>
+                
+                <span>${{getEasyShipAmount}}</span>
               </div>
               <div class="post-code">
                 <div
@@ -145,7 +138,15 @@
                     type="text"
                     class="form-control"
                     placeholder="ZIP / Postcode"
+                    v-model="postcode"
                   />
+                  <button
+                    type="button"
+                    class="promo-code__button btn d-flex align-items-center"
+                    @click="()=>addEasyShip(isAuthenticated)"
+                  >
+                    <span> Apply </span>
+                  </button>
                   <span class="post-txt text-right"
                     >Actual shipping cost will be calculated at checkout</span
                   >
@@ -164,8 +165,6 @@
                 <span>{{ $n(discountsAmount, "currency") }}</span>
               </div>
               <div class="post-code">
-                <!-- <input type="text" class="form-control" placeholder="Discount Code" />
-                <a href="#!" class="btn d-flex align-items-center"><span>apply</span></a> -->
                 <CouponCode />
               </div>
               <div
@@ -178,7 +177,7 @@
                 "
               >
                 <span>Tax</span>
-                <span>$0.00</span>
+                <span>{{ $n((totals.subtotal-productPriceTotal), "currency") }}</span>
               </div>
               <p class="frm-desc">
                 Mecca Books <strong>donates 2% of all sales</strong> to
@@ -214,7 +213,12 @@
                   "
                 >
                   <span>Your extra donation</span>
-                  <span class="amount-add">$<span class="amount">5</span></span>
+                  <select v-model="donationAmount">
+                    <option value="5">$5</option>
+                    <option value="10">$10</option>
+                    <option value="15">$15</option>
+                  </select>
+
                 </div>
               </div>
 
@@ -228,7 +232,7 @@
                 "
               >
                 <span>Total Price</span>
-                <span>{{ $n(totals.total, "currency") }}</span>
+                <span>${{donationValue ? parseFloat(donationAmount) + parseFloat(mainTotal) :  mainTotal}}</span>
               </div>
               <button
                 type="button"
@@ -242,7 +246,7 @@
         </div>
       </section>
       <section>
-        <Stepbaar v-if="isCheckoutPopup" />
+        <Stepbaar :mainTotal="mainTotal" v-if="isCheckoutPopup" />
       </section>
     </div>
   </div>
@@ -250,62 +254,78 @@
 
 <script>
 import {
-  SfLoader,
-  SfNotification,
-  SfHeading,
-  SfButton,
-  SfProperty,
-  SfPrice,
-  SfCollectedProduct,
-  SfImage,
-  SfQuantitySelector,
-} from "@storefront-ui/vue";
-import {
   computed,
   defineComponent,
-  onMounted,
-  ref,
-  useRouter,
+  ref
 } from "@nuxtjs/composition-api";
 import {
   useCart,
   useUser,
   cartGetters,
-  useExternalCheckout,
 } from "@vue-storefront/magento";
 import { onSSR } from "@vue-storefront/core";
-import { useUiState, useUiNotification } from "~/composables";
+import { useUiState } from "~/composables";
 import CouponCode from "../components/CouponCode.vue";
-import AwSidebar from "./AwComponents/organisms/AwSidebar.vue";
 import Stepbaar from "./AWcheckout/Stepbaar.vue";
 import getShippingMethodPrice from "~/helpers/checkout/getShippingMethodPrice";
+import AwQuantitySelector from '../pages/AwComponents/molecules/AwQuantitySelector.vue'
+import axios from "axios";
 
 export default defineComponent({
-  props: {},
   name: "CartSidebar",
   components: {
-    SfLoader,
-    SfNotification,
-    AwSidebar,
-    SfButton,
-    SfHeading,
-    SfProperty,
-    SfPrice,
-    SfCollectedProduct,
-    SfImage,
-    SfQuantitySelector,
+    AwQuantitySelector,
     CouponCode,
     Stepbaar,
   },
+  data() {
+    return {
+      donationValue: false,
+      donationAmount: 5,
+      postcode: '',
+      easyShipAmount: 0,
+    }
+  },
+  mounted() {
+
+    if(localStorage.getItem('donationAmount') != null) {
+      // this.donationValue = true;
+      this.donationAmount = parseFloat(localStorage.getItem('donationAmount'));
+    }
+
+  },
+  computed: {
+    getEasyShipAmount(){
+      return this.easyShipAmount;
+    }
+  },
+  watch: {
+    donationValue(newVal, oldVal) {
+      let donation = 0;
+
+      if(newVal === true) {
+        donation = this.donationAmount;
+      }
+
+      this.addDonation(this.cart.id, donation);
+
+    },
+    donationAmount(newVal, oldVal) {
+      if(newVal != oldVal) {
+        this.addDonation(this.cart.id, newVal);
+      }
+    },
+    isAuthenticated(newVal, oldVal) {
+      if(newVal === true && this.donationValue === true) {
+        this.addDonation(this.cart.id, this.donationAmount);
+      }
+    }
+  },
   setup() {
-    // const { initializeCheckout } = useExternalCheckout();
     const {
-      isCartSidebarOpen,
-      toggleCartSidebar,
       toggleCheckoutModal,
       isCheckoutPopup,
     } = useUiState();
-    // const router = useRouter();
     const {
       cart,
       removeItem,
@@ -313,8 +333,7 @@ export default defineComponent({
       load: loadCart,
       loading,
     } = useCart();
-    const { isAuthenticated } = useUser();
-    const { send: sendNotification, notifications } = useUiNotification();
+    const { user, isAuthenticated } = useUser();
 
     const products = computed(() => cartGetters.getItems(cart.value));
     const totals = computed(() => cartGetters.getTotals(cart.value));
@@ -324,21 +343,33 @@ export default defineComponent({
     const discountsAmount = computed(
       () => -1 * discounts.value.reduce((a, el) => el.value + a, 0)
     );
-    const getAttributes = (product) => product.configurable_options || [];
-    const getBundles = (product) =>
-      product.bundle_options?.map((b) => b.values).flat() || [];
     const visible = ref(false);
+    const productTotalwiithoutTax = ref(0);
     const isLoaderVisible = ref(false);
-    const donationValue = ref(false);
-    const tempProduct = ref();
+
     const { toggleLoginModal } = useUiState();
     const selectedShippingMethod = computed(() =>
       cartGetters.getSelectedShippingMethod(cart.value)
     );
 
+    const productPriceTotal = computed(() => {
+      productTotalwiithoutTax.value = 0;
+      products.value.map((element) => productTotalwiithoutTax.value += element.prices.row_total.value)
+      return productTotalwiithoutTax.value.toFixed(2);
+    });
+
     onSSR(async () => {
       await loadCart();
     });
+
+    const mainTotal = computed (() => {
+      if(selectedShippingMethod.value) {
+        return (parseFloat(totals.value.subtotal) + parseFloat(getShippingMethodPrice(selectedShippingMethod.value)) + parseFloat(discountsAmount.value));
+      }
+      else {
+        return parseFloat(totals?.value.subtotal) + parseFloat(discountsAmount.value);
+      }
+    })
 
     const goToCheckout = async () => {
       if (isAuthenticated.value) {
@@ -347,6 +378,7 @@ export default defineComponent({
         toggleLoginModal();
       }
     };
+
     const actionRemoveItem = async (product) => {
       isLoaderVisible.value = true;
 
@@ -356,10 +388,6 @@ export default defineComponent({
       visible.value = false;
     };
 
-    onMounted(()=> {
-      console.log(donationValue.value,'dndn');
-    })
-
     return {
       actionRemoveItem,
       loading,
@@ -367,18 +395,12 @@ export default defineComponent({
       products,
       removeItem,
       updateItemQty,
-      isCartSidebarOpen,
-      notifications,
       visible,
       isLoaderVisible,
-      tempProduct,
-      toggleCartSidebar,
       goToCheckout,
       totals,
       totalItems,
       cartGetters,
-      getAttributes,
-      getBundles,
       isCheckoutPopup,
       toggleCheckoutModal,
       discountsAmount,
@@ -386,9 +408,39 @@ export default defineComponent({
       hasDiscounts,
       getShippingMethodPrice,
       selectedShippingMethod,
-      donationValue
+      cart,
+      user,
+      productPriceTotal,
+      productTotalwiithoutTax,
+      mainTotal
     };
   },
+  methods: {
+      addDonation(cartID, donation) {
+        localStorage.setItem('donationAmount', donation);
+        let customer = this.getCustomerCookie();
+
+        axios.get("/addDonation?cart="+ cartID +'&donation='+donation+'&token='+ customer)
+            .then(response => {
+              console.log(response);
+            });
+      },
+      addEasyShip(isAuth) {
+        if(isAuth){
+        let customer = this.getCustomerCookie();
+
+        axios.get("/addEasyShip?postcode="+ this.postcode +'&token='+ customer)
+            .then(response => {
+              this.easyShipAmount = response.data[0].data.amount;
+            });
+        }
+      },
+      getCustomerCookie() {
+        let n = 'vsf-customer';
+        let a = `; ${document.cookie}`.match(`;\\s*${n}=([^;]+)`);
+        return a ? a[1] : '';
+      }
+  }
 });
 </script>
 

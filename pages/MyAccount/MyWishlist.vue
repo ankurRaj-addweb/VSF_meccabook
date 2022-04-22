@@ -105,11 +105,6 @@
                 </div>
               </div>
               </div>
-              <div class="filter-btn">
-                <AwButton @click="toggleFilterSidebar">
-                  <i class="icon-top"></i>
-                </AwButton>
-              </div>
             </div> 
             <div class="filter-right">
               <div class="page-details">
@@ -155,7 +150,7 @@
               <div class="category-img mob-lt-hide" 
               @click="redirectToDetailPage(product.product)"
               style="background-image: url('')">
-                
+              
                 <div class="img-wrap" >
                  <img :src="productGetters.getProductThumbnailImage(product.product)" alt="category" title="category">
                 </div>
@@ -189,7 +184,7 @@
                     </button>
                   </div>
                   <div class="preview-wrap">
-                    <a href="#" @click="toggleAlchemia">
+                    <a @click="toggleAlchemia(productGetters.getProductThumbnailImage(product.product))">
                       <i class="icon-search"></i>
                       <span class="text">See preview</span>
                     </a>
@@ -197,17 +192,17 @@
                   <section :class="alchemiaVisible ? 'alchemia-show' : 'alchemia-hide'">
                           <div class="popup-overlay active d-none d-md-block">
                         <div class="signin-popup shipping-popup watchvideo-popup">
-                          <button @click="toggleAlchemia" href="#!" class="close-icn">
+                          <button @click="toggleAlchemia(productGetters.getProductThumbnailImage(product.product))" href="#!" class="close-icn">
                             <img src="/meccabook/close-icn.svg" alt="logo" title="logo" />
                           </button>
-                          <img src="/meccabook/product-slide-img.png" alt="image" />
+                          <img class="see-preview-img" :src="previewPic" alt="image" />
                         </div>
                       </div>
                   </section>
                   <ShareButton />
                 </div>
               </div>
-                </div>
+              </div>
               </transition-group>
             </div>
           </SfLoader>
@@ -395,9 +390,11 @@ export default defineComponent({
     });
 
     const alchemiaVisible = ref(false);
+    const previewPic = ref("");
 
-    const toggleAlchemia = () => {
-          alchemiaVisible.value = !alchemiaVisible.value;
+    const toggleAlchemia = (img) => {
+      previewPic.value = img;
+      alchemiaVisible.value = !alchemiaVisible.value;
     };
 
     const redirectToDetailPage = (product) => {
@@ -425,6 +422,7 @@ export default defineComponent({
       averageRating,
       reviewGetters,
       productReviews,
+      previewPic
     };
   },
 });
@@ -603,6 +601,7 @@ export default defineComponent({
 
 .wishlist-wrap.remove-wishlist {
   margin-bottom: 9px;
+  margin-left: -6px;
 }
 
 .main {
@@ -884,6 +883,17 @@ export default defineComponent({
 }
 .alchemia-show {
   display: block;
+  .close-icn {
+    max-width: 80px;
+    width: 100%;
+  }
+  .see-preview-img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 496px;
+    height: 496px;
+  }
 }
 .alchemia-hide {
   display: none;

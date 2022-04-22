@@ -29,12 +29,6 @@
           </div>
         </div>
       </div>
-      <div class="knowledge-point">
-          <a href="#">
-            <span class="knowledge-text">Knowledge points</span>
-            <i class="icon-ribbon"></i>
-          </a>
-       </div>
     </section>
         <!-- Browse Section End -->
     <section class="browse-subject">
@@ -144,57 +138,9 @@
         <!-- Follow Us Section Start -->
     <section class="followus-sec d-none d-md-block">
       <div class="container">
-        <h4 class="followUs text-center">Follow us @MeccaBooks</h4>
+        <h4 class="followUs text-center">Followww us @MeccaBooks</h4>
       </div>
-      <div class="folow-info">
-        <ul class="follow-list">
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img1.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img2.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img3.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img1.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img2.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img3.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img1.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img2.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img3.jpg" alt="image"
-            /></a>
-          </li>
-        </ul>
-      </div>
+      <div class="powr-instagram-feed" id="dd6f9094_1648207969"></div><script src="https://www.powr.io/powr.js?platform=vuejs"></script>
     </section>
   </div>
 </template>

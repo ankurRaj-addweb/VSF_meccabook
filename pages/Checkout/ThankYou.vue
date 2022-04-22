@@ -2,21 +2,27 @@
   <div id="thank-you">
     <SfCallToAction
       v-e2e="'thank-you-banner'"
-      class="banner"
+      class="banner mob-banner"
       title="Thank you for your order!"
+
       :image="{
-        mobile: '/thankyou/bannerM.png',
-        desktop: '/thankyou/bannerD.png',
+        mobile: '/meccabook/logo.svg',
+        desktop: '/meccabook/logo.svg',
       }"
     >
+      <template #title>
+        <h1 class="thanks_text">Thank you for your order!</h1>
+      </template>
       <template #description>
         <div class="banner__order-number">
-          <span>{{ $t('Order No.') }}</span>
-          <strong>{{ orderNumber }}</strong>
+          <strong class="order_status thanks_text">{{ $t('Order Status: ') }} <span>{{ updatedOrderStatus }}</span></strong>
+        </div>
+        <div class="banner__order-number">
+          <strong  class="order_status thanks_text">{{ $t('Order No: ') }}{{ orderNumber }}</strong>
         </div>
       </template>
     </SfCallToAction>
-    <section class="section">
+    <section class="section" v-if="1==2">
       <div class="order">
         <SfHeading
           title="Your Purchase"
@@ -70,8 +76,7 @@
         </div>
       </div>
     </section>
-    <SfButton class="back-button color-secondary button-size"
-      >{{ $t('Go back to shop') }}</SfButton
+    <SfButton class="back-button color-secondary button-size" @click="$router.push('/')"><span>{{ $t('Go back to home') }}</span></SfButton
     >
   </div>
 </template>
@@ -79,6 +84,9 @@
 <script>
 import { SfHeading, SfButton, SfCallToAction } from '@storefront-ui/vue';
 import { ref } from '@nuxtjs/composition-api';
+import axios from "axios";
+import { useRoute } from "vue-router";
+
 
 export default {
   components: {
@@ -86,8 +94,19 @@ export default {
     SfButton,
     SfCallToAction
   },
+  data() {
+    return {
+      newOrderStatus: ''
+    }
+  },
+  mounted() {
+    localStorage.removeItem('donationAmount');
+    localStorage.removeItem('intent');
+    this.orderStatus(this.$route.query);
+  },
   setup(props, context) {
     context.emit('changeStep', 4);
+   // const route =useRoute()
 
     const companyDetails = ref({
       name: 'Divante Headquarter',
@@ -95,16 +114,70 @@ export default {
       city: 'Wroclaw, Poland',
       email: 'demo@vuestorefront.io'
     });
-    const orderNumber = ref('80932031-030-00');
+
+    const orderNumber = ref('Processing...');
+    const updatedOrderStatus = ref('Processing...');
+
+    const orderStatus = async (query) => {
+      console.log(query);
+      //console.log(this.$router.options.routes);
+      axios.get("/updateStatus?intentID="+ query.payment_intent)
+          .then(response => {
+            orderNumber.value = response.data[0].data.order_id;
+            updatedOrderStatus.value = response.data[0].msg;
+          });
+    };
 
     return {
       companyDetails,
-      orderNumber
+      orderNumber,
+      orderStatus,
+      updatedOrderStatus
     };
   }
 };
 </script>
 <style lang="scss" scoped>
+.banner {
+  background-size: 35% auto;
+  background-position: right 12% bottom 52%;
+  background-repeat: no-repeat;
+  background-color: #ccc;
+  border-radius: 2px;
+  @media all and (max-width: 575px) {
+    background: unset;
+    margin-bottom: 20px;
+  }
+}
+.mob-banner {
+  @media all and (max-width: 575px) {
+    background: #ccc;
+  }
+}
+h1.thanks_text {
+  font-size: 35px;
+  @media all and (max-width: 575px) {
+    font-size: 30px;
+  }
+}
+
+.thanks_text {
+  text-align: left !important;
+  font-family: leksa, serif;
+}
+
+.order_status {
+   font-size: 20px;
+  @media all and (max-width: 575px) {
+    font-size: 16px ;
+  }
+}
+
+.order_status span {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
 #thank-you {
   box-sizing: border-box;
   @include for-desktop {

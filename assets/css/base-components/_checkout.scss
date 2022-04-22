@@ -447,6 +447,7 @@
             display: inline-block;
             line-height: 1;
             text-decoration: underline;
+            color: #2C354E;
             @media all and (min-width: 1200px) {
                 @include fontsize(24px);
             }
@@ -699,6 +700,7 @@
         background: $white;
         border: 1px solid $border-gray;
         position: relative;
+        text-align: start;
         &:before {
             @include after(30px, 30px);
             @include abs(50%, auto, auto, 20px);
@@ -759,16 +761,16 @@
         padding: 0 20px;
     }
     li {
-        @include fontsize(14px);
+        @include fontsize(12px);
         line-height: 1.2;
-        padding: 10px;
+        padding: 8px;
         letter-spacing: -0.035em;
         color: $navy;
         font-family: $secondary-font;
         position: relative;
         @media all and (min-width: 1200px) {
             @include fontsize(24px);
-            padding: 21px 40px;
+            padding: 21px 30px;
             color: $gray-text;
         }
         &:after {

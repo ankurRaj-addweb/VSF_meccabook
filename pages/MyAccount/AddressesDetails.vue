@@ -1,36 +1,36 @@
 <template>
   <transition name="fade">
-    <SfTabs
+    <AwTabs
       v-if="editingAddress"
       key="edit-address"
       :open-tab="1"
       class="tab-orphan"
     >
-      <SfTab
+      <AwTab
         :title="isNewAddress ? 'Add the address' : 'Update the address'"
       >
-        <p class="message">
+        <h2 class="sec-title">
           {{ $t('Contact details updated') }}
-        </p>
+        </h2>
 
         <AddressForm
           :address="activeAddress"
           :is-new="isNewAddress"
           @submit="saveAddress"
         />
-      </SfTab>
-    </SfTabs>
+      </AwTab>
+    </AwTabs>
 
-    <SfTabs
+    <AwTabs
       v-else
       key="address-list"
       :open-tab="1"
       class="tab-orphan"
     >
-      <SfTab title="Addresses details">
-        <p class="message">
+      <AwTab title="Addresses details">
+        <h2 class="sec-title">
           {{ $t('Manage addresses') }}
-        </p>
+        </h2>
         <transition-group
           tag="div"
           name="fade"
@@ -57,16 +57,17 @@
               />
               <SfButton
                 @click="changeAddress(address)"
+                class="change-add"
               >
-                {{ $t('Change') }}
+               <span> {{ $t('Change') }} </span>
               </SfButton>
 
               <SfButton
                 v-if="!userAddressesGetters.isDefault(address)"
-                class="color-light addresses__button-delete desktop-only"
+                class="color-light addresses__button-delete desktop-only change-add delete"
                 @click="removeAddress(address)"
               >
-                {{ $t('Delete') }}
+                <span>{{ $t('Delete') }} </span>
               </SfButton>
             </div>
           </div>
@@ -77,8 +78,8 @@
         >
          <span> {{ $t('Add new address') }} </span>
         </SfButton>
-      </SfTab>
-    </SfTabs>
+      </AwTab>
+    </AwTabs>
   </transition>
 </template>
 <script>
@@ -92,11 +93,12 @@ import { computed, defineComponent, useRouter, useRoute } from '@nuxtjs/composit
 import { onSSR } from '@vue-storefront/core';
 import AddressForm from '~/components/MyAccount/AddressForm.vue';
 import UserAddressDetails from '~/components/UserAddressDetails.vue';
+import AwTabs from '../../pages/AwComponents/organisms/AwTabs.vue'
 
 export default defineComponent({
   name: 'ShippingDetails',
   components: {
-    SfTabs,
+    AwTabs,
     SfButton,
     SfIcon,
     UserAddressDetails,
@@ -181,6 +183,19 @@ export default defineComponent({
   display: flex;
   padding: var(--spacer-xl) 0;
   border-top: 1px solid var(--c-light);
+  @media all and (max-width: 767px) { 
+    display: block;
+    position: relative;
+  } 
+
+  span.smartphone-only.sf-icon {
+    position: absolute;
+    right: 10px;
+    top: 40px;
+  }
+   .sf-icon-path {
+      background: transparent !important;
+    }
 
   &:last-child {
     border-bottom: 1px solid var(--c-light);
@@ -248,5 +263,36 @@ export default defineComponent({
       }
     }
   }
+}
+
+h2.sec-title {
+    font-size: 20px;
+    margin-bottom: 36px;
+    font-weight: 600;
+    color: #2C354E;
+}
+
+.change-add {
+  width: 140px;
+}
+.change-add.delete {
+  background: #C6B075 !important;
+}
+
+.addresses__actions {
+   @media all and (max-width: 767px) { 
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: start;
+    flex-direction: row;
+  }
+  .change-add {
+    @media all and (max-width: 767px) { 
+      width: 50%;
+      height: 30px;
+    }
+  }
+
 }
 </style>
