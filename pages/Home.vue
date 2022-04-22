@@ -1,26 +1,22 @@
 <template>
   <div id="home">
-    <div class="knowledge-point">
-      <router-link to="#">
-        <span class="knowledge-text">Knowledge points</span>
-        <i class="icon-ribbon"></i>
-      </router-link>
-    </div>
-
-    <!-- home-banner component start -->
-    <HomeBanner
-      v-if="
-        getHomeContent &&
-        getHomeContent.components &&
-        getHomeContent.components.middle &&
-        getHomeContent.components.middle.carousel
-      "
-      :slider="getHomeContent.components.middle.carousel"
-    />
+      <!-- home-banner component start -->
+    <LazyHydrate when-visible>
+      <HomeBanner
+        v-if="
+          getHomeContent &&
+          getHomeContent.components &&
+          getHomeContent.components.middle &&
+          getHomeContent.components.middle.carousel
+        "
+        :slider="getHomeContent.components.middle.carousel"
+      />
+    </LazyHydrate>
     <!-- home banner component end -->
 
     <section class="knowledge-sec">
       <div class="container">
+      <LazyHydrate when-visible>
         <SeekerKnowledge
           v-if="
             getHomeContent &&
@@ -32,31 +28,42 @@
             getHomeContent.components.middle.image_title_description[0]
           "
         />
+      </LazyHydrate>
 
         <!-- featured latest popular category -->
-        <FeaturedLatestPopular :featured="getHomeFeatured" :latest="getHomeLatest" :popular="getHomePopular" v-if="getHomeFeatured && getHomeFeatured[0].data && getHomeLatest && getHomeLatest[0].data && getHomePopular && getHomePopular[0].data" />
-      </div>
-         <FeaturedlatestPopularMobile :featured="getHomeFeatured" :latest="getHomeLatest" :popular="getHomePopular" v-if="getHomeFeatured && getHomeFeatured[0].data && getHomeLatest && getHomeLatest[0].data && getHomePopular && getHomePopular[0].data" />
-    </section>
+      <SfLoader :class="{ loader: loading }" :loading="loading">
+        <FeaturedLatestPopular :featured="getHomeFeatured" :latest="getHomeLatest" :popular="getHomePopular" v-if="getHomeFeatured && getHomeFeatured[0].data && getHomeLatest && getHomeLatest[0].data && getHomePopular && getHomePopular[0].model" />
+      </SfLoader>
 
-    <BrowseBySubject
-      v-if="
-        getBrowseBySubject &&
-        getBrowseBySubject[0] &&
-        getBrowseBySubject[0].data
-      "
-      :browseBySubject="getBrowseBySubject[0].data"
-    />
+      </div>
+      <SfLoader :class="{ loader: loading }" :loading="loading">
+        <FeaturedlatestPopularMobile :featured="getHomeFeatured" :latest="getHomeLatest" :popular="getHomePopular" v-if="getHomeFeatured && getHomeFeatured[0].data && getHomeLatest && getHomeLatest[0].data && getHomePopular && getHomePopular[0].model" />
+      </SfLoader>
+    </section>
+    <LazyHydrate when-visible>
+      <BrowseBySubject
+        v-if="
+          BrowseBySubject &&
+          BrowseBySubject[0] &&
+          BrowseBySubject[0].data
+        "
+        :browseBySubject="BrowseBySubject[0].data"
+      />
+    </LazyHydrate>
 
     <!-- donationblog -->
-    <DonationBlog
-      v-if="getDonationsMagento && getDonationsMagento[0].data"
-      :donationsData="getDonationsMagento[0].data"
-    />
+    <LazyHydrate when-visible>
+      <DonationBlog
+        v-if="DonationsMagento && DonationsMagento[0].data"
+        :donationsData="DonationsMagento[0].data"
+        :applyClass="applyClass"
+      />
+    </LazyHydrate>
 
     <!-- donatelist -->
     <section class="donatelist-sec d-none d-md-block">
       <div class="container">
+      <LazyHydrate when-visible>
         <DonatelistBlog
           v-if="
             getHomeContent &&
@@ -66,13 +73,16 @@
           "
           :donateList="getHomeContent.components.middle.category_component"
         />
+      </LazyHydrate>
       </div>
     </section>
     <!-- events -->
     <section class="event-block" v-if="getUpcomingEvents">
       <div class="container">
         <h3 class="th-sec-title text-md-center">Events</h3>
-        <EventSlider :events="getUpcomingEvents" v-if="getUpcomingEvents" />
+        <LazyHydrate when-visible>
+          <EventSlider :events="getUpcomingEvents" v-if="getUpcomingEvents" />
+        </LazyHydrate>
       </div>
     </section>
     <!-- AboutBook -->
@@ -81,90 +91,28 @@
       v-if="getHomeContent && getHomeContent.components && getHomeContent.components.middle && getHomeContent.components.middle.title_description_crop_image[0]"
       :content="getHomeContent.components.middle.title_description_crop_image[0].details[0]"
       :aboutimg="getHomeContent.components.middle.title_description_crop_image[0]"
-      buttonLink="/about-us"
     />
     <!-- Follow Us Section Start -->
-    <section class="followus-sec">
+    <section class="followus-sec mt-4">
       <div class="container">
         <h4 class="followUs text-center">Follow us @MeccaBooks</h4>
       </div>
-      <div class="folow-info">
-        <ul class="follow-list">
-          <li>
-            <a href="#!">
-              <img src="/meccabook/follow-img1.jpg" alt="image" />
-            </a>
-          </li>
-          <li>
-            <a href="#!">
-              <img src="/meccabook/follow-img2.jpg" alt="image" />
-            </a>
-          </li>
-          <li>
-            <a href="#!">
-              <img src="/meccabook/follow-img3.jpg" alt="image" />
-            </a>
-          </li>
-          <li>
-            <a href="#!">
-              <img src="/meccabook/follow-img1.jpg" alt="image" />
-            </a>
-          </li>
-          <li>
-            <a href="#!">
-              <img src="/meccabook/follow-img2.jpg" alt="image" />
-            </a>
-          </li>
-          <li>
-            <a href="#!">
-              <img src="/meccabook/follow-img3.jpg" alt="image" />
-            </a>
-          </li>
-          <li>
-            <a href="#!">
-              <img src="/meccabook/follow-img1.jpg" alt="image" />
-            </a>
-          </li>
-          <li>
-            <a href="#!">
-              <img src="/meccabook/follow-img2.jpg" alt="image" />
-            </a>
-          </li>
-          <li>
-            <a href="#!">
-              <img src="/meccabook/follow-img3.jpg" alt="image" />
-            </a>
-          </li>
-        </ul>
-      </div>
+      <!-- <follow-info></follow-info> -->
+      <div class="powr-instagram-feed" id="dd6f9094_1648207969"></div><script src="https://www.powr.io/powr.js?platform=vuejs"></script>
     </section>
   </div>
 </template>
 
 <script type="module">
 import {
-  SfHero,
-  SfBanner,
-  SfCallToAction,
-  SfBannerGrid,
-} from "@storefront-ui/vue";
-import { useProduct, productGetters } from "@vue-storefront/magento";
-import {
-  computed,
   defineComponent,
-  ref,
-  onMounted,
+  ssrRef,
 } from "@nuxtjs/composition-api";
-import { onSSR } from "@vue-storefront/core";
+import { onSSR, SfLoader } from "@vue-storefront/core";
+import { useUser } from "@vue-storefront/magento";
 import LazyHydrate from "vue-lazy-hydration";
-import MobileStoreBanner from "~/components/MobileStoreBanner.vue";
-import InstagramFeed from "~/components/InstagramFeed.vue";
-import ProductsCarousel from "~/components/ProductsCarousel.vue";
-import Carousel from "vue-slick-carousel";
 import { mapActions, mapGetters } from "vuex";
-import RouterLinkButton from "../components/RouterLinkButton.vue";
 import AboutBook from "./about-us/AboutBook.vue";
-import { paginate } from "../mixins/paginatedContent.js";
 import EventSlider from "../pages/home/EventSlider.vue";
 import HomeBanner from "./home/HomeBanner.vue";
 import SeekerKnowledge from "./home/SeekerKnowledge.vue";
@@ -172,35 +120,24 @@ import DonatelistBlog from "./home/DonatelistBlog.vue";
 import BrowseBySubject from "./home/BrowseBySubject.vue";
 import FeaturedLatestPopular from "./home/FeaturedLatestPopular.vue";
 import DonationBlog from "./home/DonationBlog.vue";
-import FeaturedlatestPopularMobile from './home/FeaturedlatestPopularMobile.vue'
-
+import FeaturedlatestPopularMobile from './home/FeaturedlatestPopularMobile.vue';
+import FollowInfo from "./home/FollowInfo.vue";
 export default defineComponent({
   name: "HomePage",
   data() {
     return {
-      contentFieldName: "getLatestArticle",
-      carouselConfig: {
-        infinite: true,
-        centerMode: false,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        variableWidth: true,
-        arrows: false,
-        speed: 300,
-      },
-    };
+      applyClass: false
+    }
+  },
+  mounted() {
+    window.addEventListener('scroll', () => {
+      if(window.scrollY > 1000) {
+        this.applyClass = true
+      }
+    });
   },
   components: {
-    InstagramFeed,
     LazyHydrate,
-    MobileStoreBanner,
-    ProductsCarousel,
-    SfBanner,
-    SfBannerGrid,
-    SfCallToAction,
-    SfHero,
-    Carousel,
-    RouterLinkButton,
     AboutBook,
     EventSlider,
     HomeBanner,
@@ -210,126 +147,72 @@ export default defineComponent({
     FeaturedLatestPopular,
     DonationBlog,
     FeaturedlatestPopularMobile,
+    FollowInfo,
+    SfLoader
   },
-  mixins: [paginate],
   setup(context) {
-    const {
-      products: newProductsResult,
-      search: newProductsSearch,
-      loading: newProductsLoading,
-    } = useProduct("newProducts");
+    const { loading } = useUser();
 
-    const bannercarousel = ref(null);
+    const BrowseBySubject = ssrRef(null);
 
-    // @ts-ignore
-    const newProducts = computed(() =>
-      productGetters.getFiltered(newProductsResult.value?.items, {
-        master: true,
-      })
-    );
-
-    const next = () => {
-      bannercarousel.value.next();
+    const fetchBrowseBySubject = async () => {
+      let data = await fetch(process.env.MAGENTO_MECCABOOK + '/rest/V1/subjects').then(res => res.json());
+      return data;
     };
 
-    const prev = () => {
-      bannercarousel.value.prev();
-    };
+    const DonationsMagento = ssrRef(null);
 
-    onMounted(() => {
-      const dotsWrapper = document.getElementsByClassName("slick-dots")[0];
-      if (dotsWrapper) {
-        dotsWrapper.style.display = "flex";
-      }
-    });
+    const fetchDonationsMagento = async () => {
+      let data = await fetch(process.env.MAGENTO_MECCABOOK + '/rest/V1/donations').then(res => res.json());
+      return data;
+    };
 
     onSSR(async () => {
-      await newProductsSearch({
-        pageSize: 10,
-        currentPage: 1,
-        sort: {
-          position: "ASC",
-        },
-      });
+      BrowseBySubject.value = await fetchBrowseBySubject();
+      DonationsMagento.value = await fetchDonationsMagento();
     });
-
-    const carouselConfig = ref({
-      infinite: true,
-      centerMode: false,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      variableWidth: true,
-      arrows: false,
-      speed: 300,
-    });
-
     return {
-      newProducts,
-      newProductsLoading,
-      productGetters,
-      carouselConfig,
-      next,
-      prev,
-      bannercarousel,
+      BrowseBySubject,
+      DonationsMagento,
+      loading
     };
   },
   computed: {
     ...mapGetters("drupalcms", [
-      "getArticlesContent",
-      "getLatestArticle",
       "getHomeContent",
       "getUpcomingEvents",
-      "getBrowseBySubject",
       "getHomeFeatured",
       "getHomeLatest",
       "getHomePopular",
-      "getDonationsMagento",
     ]),
   },
   methods: {
     ...mapActions("drupalcms", [
-      "fetchArticles",
       "fetchHome",
       "fetchUpcomingEvents",
-      "fetchBrowseBySubject",
       "fetchHomeFeatured",
       "fetchHomeLatest",
       "fetchHomePopular",
-      "fetchDonationsMagento",
     ]),
-    prevKn() {
-      this.$refs.kgcarousel.prev();
-    },
-    nextKn() {
-      this.$refs.kgcarousel.next();
-    },
   },
-  mounted() {
+  beforeMount() {
     this.fetchHome();
     this.fetchUpcomingEvents();
-    this.fetchBrowseBySubject();
     this.fetchHomeFeatured();
     this.fetchHomeLatest();
     this.fetchHomePopular();
-    this.fetchDonationsMagento();
-  },
-  beforeMount() {
-    this.fetchArticles();
   },
 });
 </script>
-
 <style lang="scss" scoped>
 .article-meta h4 a {
   color: #111111;
   font-weight: 600;
   font-size: 20px;
 }
-
 .article-meta {
   margin-top: 10px;
 }
-
 .article-item__meta-item:not(:last-child)::after {
   display: inline-block;
   content: "";
@@ -340,7 +223,6 @@ export default defineComponent({
   background: rgba(0, 0, 0, 0.4);
   vertical-align: middle;
 }
-
 #home {
   box-sizing: border-box;
   @include for-desktop {
@@ -348,19 +230,15 @@ export default defineComponent({
     margin: 0 auto;
   }
 }
-
 .hero {
   margin: var(--spacer-xl) auto var(--spacer-lg);
   --hero-item-background-position: center;
-
   ::v-deep .sf-link:hover {
     color: var(--c-white);
   }
-
   @include for-desktop {
     margin: var(--spacer-xl) auto var(--spacer-2xl);
   }
-
   .sf-hero-item {
     &:nth-child(even) {
       --hero-item-background-position: left;
@@ -375,18 +253,15 @@ export default defineComponent({
     }
   }
 }
-
 ::v-deep .sf-hero__controls {
   --hero-controls-display: none;
 }
 .banner-grid {
   --banner-container-width: 50%;
   margin: var(--spacer-xl) 0;
-
   ::v-deep .sf-link:hover {
     color: var(--c-white);
   }
-
   @include for-desktop {
     margin: var(--spacer-2xl) 0;
     ::v-deep .sf-link {
@@ -394,19 +269,16 @@ export default defineComponent({
     }
   }
 }
-
 .banner {
   &__tshirt {
     background-position: left;
   }
-
   &-central {
     @include for-desktop {
       --banner-container-flex: 0 0 70%;
     }
   }
 }
-
 .similar-products {
   display: flex;
   justify-content: space-between;
@@ -420,7 +292,6 @@ export default defineComponent({
     padding-bottom: 0;
   }
 }
-
 .call-to-action {
   background-position: right;
   margin: var(--spacer-xs) 0;
@@ -428,51 +299,42 @@ export default defineComponent({
     margin: var(--spacer-xl) 0 var(--spacer-2xl) 0;
   }
 }
-
 .carousel {
   margin: 0 calc(-1 * var(--spacer-sm)) 0 0;
   @include for-desktop {
     margin: 0;
   }
-
   &__item {
     margin: 1.375rem 0 2.5rem 0;
     @include for-desktop {
       margin: var(--spacer-xl) 0 var(--spacer-xl) 0;
     }
-
     &__product {
       --product-card-add-button-transform: translate3d(0, 30%, 0);
     }
   }
 }
-
 .new-collection {
   @media (max-width: 767px) {
     padding-top: 0;
   }
 }
-
 #layout {
   max-width: none;
 }
-
 .prev,
 .next {
   &.is-brown {
     background-image: url(/assets/meccabook/slide-arrow-gold.svg);
   }
-
   @media (max-width: 767px) {
     top: 25%;
   }
 }
-
 .next {
   right: 0;
   transform: rotate(180deg);
 }
-
 .custom-dot {
   width: 14px;
   height: 14px;
@@ -480,13 +342,11 @@ export default defineComponent({
   border-radius: 50%;
   cursor: pointer;
 }
-
 .slick-active {
   .custom-dot {
     background-color: #c6b075;
   }
 }
-
 .event-block {
   .container {
     @media (max-width: 768px) {
@@ -497,40 +357,32 @@ export default defineComponent({
     }
   }
 }
-
 .home-banner .slide-img {
   height: 600px;
   width: 100vw;
   opacity: 0.8;
-
   @media (max-width: 1152px) {
     height: 480px;
   }
-
   @media (max-width: 768px) {
     height: 320px;
   }
-
   @media (max-width: 375px) {
     height: 270px;
   }
 }
-
 .content-blog .subtitle {
   margin-bottom: 30px;
 }
-
 .content-blog p.desc {
   margin-bottom: 30px;
 }
-
 .feature-homeblog {
   .feature-block {
     padding-top: 50px;
     border-top: 1px solid #c6b075;
   }
 }
-
 .related-product-sec {
   @media only screen and (min-width: 1200px) {
     .container {

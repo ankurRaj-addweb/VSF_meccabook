@@ -29,11 +29,7 @@
             <div v-if=" product.title" class="category-name">{{ product.title }}</div>
             <div v-if="product.author" class="category-info">{{ product.author }}</div>
             <div v-if="product.price" class="price-wrap">${{ product.price }}</div>
-            <div class="rating">
-              <div class="ratings-wrap">
-                <img src="/meccabook/ratings.png" alt="rating" title="rating" />
-              </div>
-            </div>
+            <rating :rating="product.rating"></rating>
           </div>
         </div>
     </div>
@@ -45,8 +41,12 @@
 <script>
 import { useUiState } from "~/composables";
 import { useRouter } from "@nuxtjs/composition-api";
+import rating from "~/components/Products/Rating.vue";
 
 export default {
+  components: {
+    rating
+  },
   data() {
     return {
       RecentViewProduct: null,
@@ -66,6 +66,12 @@ export default {
     else{
         this.RecentViewProduct = Storedata;
     }
+  },
+  beforeMount() {
+    document.body.classList.add('pro-detail');
+  },
+  beforeDestroy() {
+    document.body.classList.remove('pro-detail');
   },
   setup() {
     const { getSlugLink } = useUiState();

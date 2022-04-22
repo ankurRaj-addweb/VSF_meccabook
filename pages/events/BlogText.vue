@@ -20,7 +20,6 @@
         class="desc"
         v-html="detailComponents.description.text"
       />
-      <!-- <a href="" class="ev-link">https://isna.net/convention/</a> -->
     </div>
   </div>
 </template>

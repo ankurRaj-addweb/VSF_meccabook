@@ -1,7 +1,6 @@
 <template>
   <div class="advisor-head">
-    <h2 class="">{{ content.title }}</h2>
-    <!-- <h2 class="d-md-none" v-html="content.description.text" /> -->
+    <h2>{{ content.title }}</h2>
     <p class="desc d-none d-md-block" v-html="content.description.text" />
   </div>
 </template>

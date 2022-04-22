@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="address-card">
     <span class="name"
       :style="userAddress.isDefault ? '' : ''"
     >
@@ -74,5 +74,10 @@ p {
 
 .phone {
   margin-top: var(--spacer-base);
+}
+.address-card  {
+  .addr, .name {
+      font-size: 18px;
+  }
 }
 </style>

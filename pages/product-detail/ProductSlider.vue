@@ -7,35 +7,56 @@
         :asNavFor="$refs.minicarousel"
         ref="carousel"
         :focusOnSelect="true"
+        :initialSlide= "imageIndex"
+        @beforeChange="syncSliders"
         v-if="productGallery && productGallery.length > 0"
       >
         <div v-for="(i, idx) in productGallery" :key="idx" class="product-img"
           :class="breadcrumbs[0].text==='Kids' ? ('kidsbg' + (Math.floor(Math.random() * 8)+1)) : 'slider-img-bg'"
         >
-          <img :src="i.big.url" alt="image" class="Slider-img" />
-          <!-- <img src="/meccabook/product-slide-img.png" alt="image" /> -->
+          <img :src="i.url" alt="image" class="Slider-img" />
         </div>
       </carousel>
         <div id="watchVideo" class="watch-content text-center text-md-left">
-        <a href="#" @click="toggleAlchemia" class="preview-btn btn d-none d-lg-flex align-items-center justify-content-center"><span>preview</span></a>
+        <a @click="toggleAlchemia(); addBodyClass();"  class="preview-btn btn d-none d-lg-flex align-items-center justify-content-center"><span>preview</span></a>
         </div>
-       <section :class="alchemiaVisible ? 'alchemia-show' : 'alchemia-hide'">
+       <section :class="alchemiaVisible ? 'alchemia-show' : 'alchemia-hide'"
+        v-for="(i, idx) in productGallery" :key="idx">
           <div class="popup-overlay active d-none d-md-block">
         <div class="signin-popup shipping-popup watchvideo-popup">
-          <button @click="toggleAlchemia" href="#!" class="close-icn">
+          <button @click="toggleAlchemia(); removeBodyClass();" class="close-icn">
             <img src="/meccabook/close-icn.svg" alt="logo" title="logo" />
           </button>
-          <!-- <carousel
-            :arrows="false"
-            :asNavFor="$refs.minicarousel"
-            ref="carousel"
-            v-if="productGallery && productGallery.length > 0"
-          > -->
-            <!-- <div v-for="(i, idx) in productGallery" :key="idx" class="product-img"> -->
-              <!-- <img :src="i.big.url" alt="image" class="Slider-img" /> -->
-              <img src="/meccabook/product-slide-img.png" alt="image" />
-            <!-- </div> -->
-          <!-- </carousel> -->
+            <div class="book-wrapper">
+              <div class="book-main-wrapper">
+                <div class="book-cover">
+                  <div class="pageprev" id="secondprev">
+                    <div class="front">
+                        <div class="outer">
+                            <div class="content">
+                              <img :src="productGallery[imageIndex].url" v-if="productGallery[imageIndex]"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="back" id="thirdprev">
+                        <div class="outer">
+                            <div class="content">
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="pageprev" id="fourthprev">
+                        <div class="front">
+                            <div class="outer">
+                                <div class="content">
+                                    <img :src="productGallery[0].url"  v-if="productGallery[0]"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            </div>
         </div>
       </div>
         </section>
@@ -47,13 +68,15 @@
         ref="minicarousel"
         :slidesToShow="4"
         :focusOnSelect="true"
+        :initialSlide= "imageIndex"
+        @beforeChange="syncSliders"
         v-if="productGallery && productGallery.length > 0"
       >
         <div class="thumb-img small-thumb-img"  
         v-for="(i, idx) in productGallery" :key="idx"
         :class="breadcrumbs[0].text==='Kids' ? ('kidsbg' + (Math.floor(Math.random() * 8)+1)) : 'slider-img-bg'"
         >
-          <img :src="i.big.url" alt="image" class="small-Slider-img" />
+          <img :src="i.url" alt="image" class="small-Slider-img" />
         </div>
       </carousel>
       <template v-if="productGallery.length > 4">
@@ -69,8 +92,8 @@
   </div>
   <div v-else>
     <div class="product-img">
-          <img src="/meccabook/product-slide-img.png" alt="image" />
-        </div>
+      <img src="/meccabook/product-slide-img.png" alt="image" />
+    </div>
   </div>
 </template>
 
@@ -96,15 +119,19 @@ export default {
       }
     },
     props:  {
-    productGallery: {
-      type: [Object, Array],
-      default: null
+      productGallery: {
+        type: [Object, Array],
+        default: null
+      },
+      breadcrumbs: {
+        type: [Array, Object],
+        default: null
+      },
+      imageIndex: {
+        type: Number,
+        default: 0
+      }
     },
-    breadcrumbs: {
-      type: [Array, Object],
-      default: null
-    }
-  },
     components: {
         Carousel
     },
@@ -117,6 +144,29 @@ export default {
       this.$refs.carousel.prev();
       this.$refs.minicarousel.prev();
     },
+
+     addBodyClass() {
+       var previewButton = document.getElementsByTagName("body")[0];
+       
+
+        setTimeout(function(){
+          previewButton.classList.add("bookOpened");
+          previewButton.classList.add("openBook");
+          var prevsty = document.getElementById("secondprev");
+          prevsty.style.msTransform = "rotateY(-180deg)";
+          prevsty.style.webkitTransform = "rotateY(-180deg)";
+          prevsty.style.transform = "rotateY(-180deg)";
+        }, 1200);
+    },
+
+    removeBodyClass() {
+      var previewClose = document.getElementsByTagName("body")[0];
+      previewClose.classList.remove("openBook");
+
+      setTimeout(function() {
+            previewClose.classList.remove("bookOpened");
+      }, 1500);
+    }
   },
   setup() {
     const alchemiaVisible = ref(false);
@@ -194,6 +244,17 @@ i.small-thumb-prev.control.prev {
 
 .alchemia-show {
   display: block;
+  .close-icn {
+    max-width: 80px;
+    width: 100%;
+  }
+  .see-preview-img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 496px;
+    height: 496px;
+  }
 }
 
 .alchemia-hide {

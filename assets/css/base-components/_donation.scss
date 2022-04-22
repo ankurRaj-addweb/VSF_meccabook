@@ -71,8 +71,9 @@
             width: 130px;
         }
         img {
-            width: 100%;
-        }
+            width: 130px;
+            height: 40px;
+        }    
     }
 }
 
@@ -122,16 +123,21 @@
 }
 
 .loc-view {
-    padding: 10px 0;
     width: 100px;
+    height: 100px;
     background: #faf8f4;
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
+    img {
+        width: 60px;
+        height: 80px;
+        margin: 10px 10px 10px 20px;
+    }
 }
 
 .loc-desc {
     @include fontsize(12px);
-    padding: 0 20px;
+    padding: 0 10px;
     width: calc(100% - 100px);
     line-height: 1.4;
     font-weight: 300;

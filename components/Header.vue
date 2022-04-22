@@ -1,10 +1,10 @@
 <template>
   <div>
-    <fixed-header>
-    <header class="header" 
+    <!-- <fixed-header> -->
+    <header class="header"
      :style="$route.path.includes('kids') ? 'background-image: url(/meccabook/kids-bg-img.png)' : 'background-image: url()'">
       <div class="offer-header">
-        <p>Free US shipping for purchases over $123</p>
+        <p v-if="getRibbinContent" v-html="getRibbinContent"></p>
         <div class="btn-wrap">
           <button class="close-btn"></button>
         </div>
@@ -87,7 +87,7 @@
                       class="btn-wrp"
                       @click="logoutFunc"
                     >
-                      <nuxt-link to="#!" class="btn text-uppercase">
+                      <nuxt-link to="" class="btn text-uppercase" @click.native="closeDropDown">
                         <span>sign out</span>
                       </nuxt-link>
                     </div>
@@ -95,15 +95,14 @@
                       v-if="isAuthenticated"
                       to="/my-account/manage-account"
                       class="acc-link"
+                      @click.native="closeDropDown"
                       >Manage Account</nuxt-link
                     >
-                    <nuxt-link v-if="isAuthenticated" to="/my-account/orders" class="acc-link"
+                    <nuxt-link v-if="isAuthenticated" to="/my-account/orders" class="acc-link" @click.native="closeDropDown"
+                     
                       >Orders</nuxt-link
                     >
-                    <nuxt-link v-if="isAuthenticated" to="/my-account/payment-methods" class="acc-link"
-                      >Payment Methods</nuxt-link
-                    >
-                    <nuxt-link v-if="isAuthenticated" to="/my-account/wishlist" class="acc-link"
+                    <nuxt-link v-if="isAuthenticated" to="/my-account/wishlist" class="acc-link" @click.native="closeDropDown"
                       >Wishlist</nuxt-link
                     >
                   </div>
@@ -266,7 +265,7 @@
                 @click="catchVal(categoryTree[0].label)"
                 v-if="categoryTree[0].items"
                 class="nav-link dropdown-toggle"
-                :class="categoryTree[0].label == categoryVal ? 'active' : null"
+                :class="categoryTree[0].label == categoryVal && screenWidth <= 767 ? 'active' : null"
                 >{{ categoryTree[0].label }}</label
               >
               <nuxt-link
@@ -303,8 +302,9 @@
                           subcategory
                         )
                       "
-                      :class="subcatValue == subcategory.label ? 'active' : ''"
-                      class="dropdown-item has-submenu cursor-pointer"
+                      :class="subcatValue == subcategory.label ? subcategory.items.length > 0 ? 'active has-submenu':'active' : subcategory.items.length > 0 ? 'has-submenu':''"
+                      class="dropdown-item cursor-pointer"
+                    
                       >{{ subcategory.label }}</label
                     >
                     <nuxt-link
@@ -341,6 +341,7 @@
                               )
                             "
                             class="level-item"
+                            @click.native="toggleSidebar"
                           >
                             {{ childcategory.label }}
                           </nuxt-link>
@@ -351,13 +352,13 @@
                 </ul>
               </div>
             </li>
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown" @click="toggleSidebar">
               <nuxt-link
                 to="/c/arabic-books"
                 @click="catchVal(categoryTree[1].label)"
                 v-if="categoryTree[1].items"
                 class="nav-link"
-                :class="categoryTree[1].label == categoryVal ? 'active' : null"
+                :class="categoryTree[1].label == categoryVal && screenWidth <= 767 ? 'active' : null"
                 >{{
                   categoryTree[1].label === "Arabic Books"
                     ? "Arabic"
@@ -438,17 +439,24 @@
                 </ul>
               </div>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" @click="toggleSidebar">
               <router-link class="nav-link" to="/c/categories/gifts"
                 >Gifts & Apparel</router-link
               >
             </li>
              <li class="nav-item dropdown">
+              <label
+                @click="catchVal(categoryTree[2].label)"
+                v-if="categoryTree[2].items"
+                class="nav-link dropdown-toggle blue-text Acme-font d-block d-md-none"
+                :class="categoryTree[2].label == categoryVal && screenWidth <= 767 ? 'active' : null"
+                ><nuxt-link to="/kids-home" class="blue-text Acme-font" @click.native="toggleSidebar">{{ categoryTree[2].label }}</nuxt-link></label
+              >
               <nuxt-link to="/kids-home"
                 @click="catchVal(categoryTree[2].label)"
                 v-if="categoryTree[2].items"
-                class="nav-link dropdown-toggle blue-text Acme-font"
-                :class="categoryTree[2].label == categoryVal ? 'active' : null"
+                class="nav-link dropdown-toggle blue-text Acme-font d-none d-md-block"
+                :class="categoryTree[2].label == categoryVal && screenWidth <= 767 ? 'active' : null"
                 >{{ categoryTree[2].label }}</nuxt-link
               >
               <nuxt-link
@@ -475,6 +483,7 @@
                   <li
                     v-for="(subcategory, index) in categoryTree[2].items"
                     :key="index"
+                    @click="toggleSidebar"
                   >
                     <label
                       v-if="subcategory.items"
@@ -485,13 +494,13 @@
                           subcategory
                         )
                       "
-                      :class="subcatValue == subcategory.label ? 'active' : ''"
-                      class="dropdown-item has-submenu cursor-pointer"
+                      :class="subcatValue == subcategory.label ? subcategory.items.length > 0 ? 'active has-submenu':'active' : subcategory.items.length > 0 ? 'has-submenu':''"
+                      class="dropdown-item cursor-pointer"
                       >{{ subcategory.label }}</label
                     >
                     <nuxt-link
                       v-else
-                      class="dropdown-item has-submenu b"
+                      class="dropdown-item   b"
                       to="#!"
                     >
                       {{ subcategory.label }}
@@ -533,11 +542,11 @@
                 </ul>
               </div>
             </li>
-            
-            <template v-if="getMenuContent && getMenuContent.header">
+
+            <template v-if="menu && menu.header">
               <li
                 class="nav-item"
-                v-for="item in getMenuContent.header"
+                v-for="item in menu.header"
                 :key="item.url"
               >
               <template v-if="item.child && item.child.length > 0">
@@ -557,12 +566,6 @@
                     v-for="(subcategory, index) in item.child"
                     :key="index"
                   >
-                    <!-- <label
-                      v-if="subcategory.items"
-                      :class="subcatValue == subcategory[0].name ? 'active' : ''"
-                      class="dropdown-item e"
-                      >{{ subcategory[0].name }}</label
-                    > -->
                     <nuxt-link
                       class="dropdown-item f"
                       :to="subcategory[0].url"
@@ -572,12 +575,13 @@
                   </li>
                   </ul>
                 </div>
-                <router-link class="nav-link dropdown-toggle" :to="item.url">{{
+                <router-link class="nav-link dropdown-toggle" :to="item.url" @click.native=toggleSidebar>{{
                   item.name
                 }}</router-link>
               </template>
                 <div v-else>
-                  <router-link class="nav-link" :to="item.url">{{
+                  <router-link class="nav-link" :to="item.url" @click.native=toggleSidebar
+                  >{{
                   item.name
                   }}</router-link>
                 </div>
@@ -630,7 +634,7 @@
                       class="btn-wrp"
                       @click="handleAccountClick"
                     >
-                      <nuxt-link to="#!" class="btn text-uppercase">
+                      <nuxt-link to="" class="btn text-uppercase">
                         <span>sign in</span>
                       </nuxt-link>
                     </div>
@@ -639,7 +643,7 @@
                       class="btn-wrp"
                       @click="showRegisterForm"
                     >
-                      <nuxt-link to="#" class="btn text-uppercase">
+                      <nuxt-link to="" class="btn text-uppercase">
                         <span>Register</span>
                       </nuxt-link>
                     </div>
@@ -648,7 +652,7 @@
                       class="btn-wrp"
                       @click="logoutFunc"
                     >
-                      <nuxt-link to="#!" class="btn text-uppercase">
+                      <nuxt-link to="" class="btn text-uppercase">
                         <span>sign out</span>
                       </nuxt-link>
                     </div>
@@ -660,9 +664,6 @@
                     >
                     <nuxt-link v-if="isAuthenticated" to="/my-account/orders" class="acc-link"
                       >Orders</nuxt-link
-                    >
-                    <nuxt-link v-if="isAuthenticated" to="/my-account/payment-methods" class="acc-link"
-                      >Payment Methods</nuxt-link
                     >
                     <nuxt-link v-if="isAuthenticated" to="/my-account/wishlist" class="acc-link"
                       >Wishlist</nuxt-link
@@ -875,7 +876,7 @@
         </div>
       </nav>
     </header>
-    </fixed-header>
+    <!-- </fixed-header> -->
   </div>
 </template>
 
@@ -903,13 +904,17 @@ import {
 import {
   computed,
   ref,
+  ssrRef,
   onBeforeUnmount,
   watch,
   defineComponent,
   useRouter,
   useRoute,
   useContext,
+  onMounted
 } from "@nuxtjs/composition-api";
+
+
 import { onSSR } from "@vue-storefront/core";
 import { clickOutside } from "@storefront-ui/vue/src/utilities/directives/click-outside/click-outside-directive.js";
 import {
@@ -923,6 +928,7 @@ import SearchResults from "~/components/SearchResults.vue";
 import { mapActions, mapGetters } from "vuex";
 import algoliaSearch from "algoliasearch";
 import FixedHeader from 'vue-fixed-header'
+import axios from "axios";
 export default defineComponent({
   components: {
     SfHeader,
@@ -936,14 +942,25 @@ export default defineComponent({
     SfOverlay,
     FixedHeader
   },
+  data(){
+    return{
+      screenWidth: null
+    }
+  },
   props: {
     currentUser: {
       type: Object,
       default: null,
     },
+    magentoURL: String,
+    drupalURL: String
   },
   directives: { clickOutside },
-  setup() {
+  setup(props) {
+
+    console.log(props.magentoURL)
+    console.log(props.drupalURL)
+
     const router = useRouter();
     const route = useRoute();
     const {
@@ -970,6 +987,7 @@ export default defineComponent({
     const { categories: categoryList, search: categoriesListSearch } =
       useCategory("AppHeader:CategoryList");
 
+    const ribbinContent = ref(null);
     const term = ref(getFacetsFromURL().term);
     const isSearchOpen = ref(false);
     const searchBarRef = ref(null);
@@ -995,11 +1013,21 @@ export default defineComponent({
       isAuthenticated.value ? "profile_fill" : "profile"
     );
 
+    const getRibbinContent = computed(() => ribbinContent.value);
+
     const logoutFunc = async () => {
       await logout();
       await router.push(localePath({ name: "home" }));
 
       return;
+    };
+
+    const menu = ssrRef(null);
+
+    const fetchMenu = async () => {
+      let menuURL = props.drupalURL+ '/api/menu'
+      let data = await fetch(menuURL).then(res => res.json());
+      return data;
     };
 
     const CSMpage = [
@@ -1041,9 +1069,9 @@ export default defineComponent({
     const useAlgoliaSearch = async () => {
       const client = algoliaSearch(
         "210ZCLJ1JA",
-        "022a160adf013fc06c7fb16257475f13"
+        "dc28e43107e238e1166d2a460327e113"
       );
-      const index = client.initIndex("dev_addweb_meccadefault_products");
+      const index = client.initIndex("meccabook_magento_stage_default_products");
       await index
         .search(searchTerm.value)
         .then(({ hits }) => {
@@ -1078,6 +1106,9 @@ export default defineComponent({
           pageSize: 20,
         }),
       ]);
+
+      menu.value = await fetchMenu();
+
     });
 
     const showDrop = () => {
@@ -1101,6 +1132,7 @@ export default defineComponent({
 
     const toggleSidebar = () => {
       showSidebar.value = !showSidebar.value;
+      closeDropDown()
     };
 
     const catchVal = (e) => {
@@ -1174,8 +1206,19 @@ export default defineComponent({
       result.value = null;
     };
 
+    const fetchHomeRibbin = () => {
+      axios.get("/ribbin")
+          .then(response => {
+            ribbinContent.value = response.data[0].data;
+             })
+    };
+
     onBeforeUnmount(() => {
       unMapMobileObserver();
+    });
+
+    onMounted(() => {
+      fetchHomeRibbin();
     });
 
     return {
@@ -1220,6 +1263,9 @@ export default defineComponent({
       redirectToSearchPage,
       showRegisterForm,
       logoutFunc,
+      menu,
+      ribbinContent,
+      getRibbinContent
     };
   },
   computed: {
@@ -1235,7 +1281,9 @@ export default defineComponent({
     ...mapActions("drupalcms", ["fetchMenu"]),
   },
   mounted() {
-    this.fetchMenu();
+    console.log(this.$config);
+    this.screenWidth = window.innerWidth
+    //this.fetchMenu();
   },
 });
 </script>
@@ -1244,12 +1292,11 @@ export default defineComponent({
 @import "/assets/css/main.scss";
 
 .hidder-style {
-  opacity: 0;
+  display: none;
 }
 
 .show-style {
   display: block;
-  opacity: 1;
 }
 
 .nav-item {
@@ -1315,7 +1362,7 @@ export default defineComponent({
 }
 
 .signin-drpdwn {
-  top: 100% !important;
+  top: 97% !important;
 }
 
 .signin-drpdwn .btn-wrp {
@@ -1440,18 +1487,23 @@ h2.sign-title {
   font-family: "Acme", sans-serif;
 }
 
+
 .header {
-background: #FFFFFF;
+  background: #FFFFFF;
+  max-height: 350px;
+  height: 100%;
 }
 
-.vue-fixed-header--isFixed {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  z-index: 99999;
-  background: #FFFFFF;
-  box-shadow: 0px 4px 4px rgb(0 0 0 / 6%);
-  transition: all 0.7s ease-in;
-}
+// .vue-fixed-header--isFixed {
+//   position: fixed;
+//   left: 0;
+//   top: 0;
+//   width: 100%;
+//   z-index: 995;
+//   background: #FFFFFF;
+//   box-shadow: 0px 4px 4px rgb(0 0 0 / 6%);
+//   transition: all 0.7s ease-in;
+//   max-height: 204px;
+//   height: 100%;
+// }
 </style>

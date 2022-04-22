@@ -39,3 +39,82 @@
           }
       }
   }
+  
+  .events-sliders {
+      position: relative;
+      .slick-slider .slick-arrow {
+          background: url(/meccabook/next-event.png) no-repeat center center !important;
+      }
+      button {
+          font-size: 0;
+      }
+      .slick-slider .slick-arrow {
+          width: 40px;
+          height: 40px;
+      }
+      button.slick-arrow.slick-next {
+          position: absolute;
+          bottom: -37px;
+          background-color: #fff !important;
+          left: 73%;
+          transform: rotate(0deg);
+          @media all and (max-width: 1299px) {
+              left: 73.5%;
+          }
+          @media all and (max-width: 991px) {
+              left: 71.5%;
+          }
+          @media all and (max-width: 767px) {
+              left: 66.5%;
+              bottom: -38px;
+          }
+      }
+      button.slick-arrow.slick-prev {
+          position: absolute;
+          bottom: -38px;
+          left: 61%;
+          background-color: #fff !important;
+          transform: rotate(180deg);
+          @media all and (max-width: 1299px) {
+              left: 57%;
+          }
+          @media all and (max-width: 991px) {
+              left: 51.5%;
+          }
+          @media all and (max-width: 767px) {
+              left: 23.5%;
+          }
+      }
+      .showmore-card-btn {
+          padding-bottom: 35px;
+          .show-more {
+              z-index: 999;
+              position: absolute;
+              right: 25%;
+              bottom: 0px;
+              @media all and (max-width: 1024px) {
+                  bottom: -2px;
+              }
+              @media all and (max-width: 767px) {
+                  left: 0;
+                  right: 0;
+              }
+              span.slideEvent {
+                  background-color: #fff;
+                  box-shadow: unset;
+                  color: #988146;
+                  padding: 10px 40px 10px;
+                  font-size: 16px;
+                  font-weight: 400;
+                  font-style: normal;
+                  font-family: $primary-font;
+              }
+          }
+      }
+  }
+  
+  .address-card {
+      .addr-label {
+          text-align: start !important;
+      }
+  }

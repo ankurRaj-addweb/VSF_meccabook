@@ -2,7 +2,7 @@
   <div v-if="isLoginModalOpen" class="wrapper">
     <div class="popup-overlay active d-md-block">
       <div class="signin-popup">
-        <a href="#!" class="close-icn" @click="closeModal">
+        <a href="" class="close-icn" @click="closeModal">
           <img src="/meccabook/close-icn.svg" alt="logo" title="logo" />
         </a>
         <div class="text-center">
@@ -11,30 +11,32 @@
           </a>
         </div>
         <h2 v-if="isLogin && !createAccount" class="sign-title text-center">
-          Sign In To Checkout
+          Sign In
         </h2>
         <h2 v-if="createAccount" class="sign-title text-center">Register</h2>
-
+        <AwLoader :class="{ loading }" :loading="loading">
         <div v-if="isLogin && !createAccount">
           <ValidationObserver v-slot="{ handleSubmit }" key="log-in">
             <form class="form-wrap" @submit.prevent="handleSubmit(handleLogin)">
               <div class="sign-input-wrap">
                 <ValidationProvider v-slot="{ errors }" rules="required|email">
                   <label class="text-uppercase">email address</label>
-                  <p class="error-msg">{{ errors[0] }}</p>
+                  <p class="error-msg" v-if="setShowError">{{ errors[0] }}</p>
                   <input
                     v-model="form.username"
                     name="email"
                     type="text"
                     class="form-control"
                     placeholder
+                    @blur="handleBlur()"
+                    @focus="handleFocus()"
                   />
                 </ValidationProvider>
               </div>
               <div class="sign-input-wrap">
                 <ValidationProvider v-slot="{ errors }" rules="required">
                   <label class="text-uppercase">password</label>
-                  <p class="error-msg">{{ errors[0] }}</p>
+                  <p class="error-msg" v-if="setShowError">{{ errors[0] }}</p>
                   <input
                     v-model="form.password"
                     name="password"
@@ -88,11 +90,13 @@
               <div class="sign-input-wrap">
                 <ValidationProvider v-slot="{ errors }" rules="required|email">
                   <label class="text-uppercase">Email Address</label>
-                  <p class="error-msg">{{ errors[0] }}</p>
+                  <p class="error-msg" v-if="setShowError">{{ errors[0] }}</p>
                   <input
                     v-model="form.username"
                     type="text"
                     class="form-control"
+                    @blur="handleBlur()"
+                    @focus="handleFocus()"
                   />
                 </ValidationProvider>
               </div>
@@ -164,13 +168,15 @@
               <div class="sign-input-wrap">
                 <ValidationProvider v-slot="{ errors }" rules="required|email">
                   <label class="text-uppercase"> Email address</label>
-                  <p class="error-msg">{{ errors[0] }}</p>
+                  <p class="error-msg" v-if="setShowError">{{ errors[0] }}</p>
                   <input
                     v-model="form.email"
                     name="your-email"
                     type="text"
                     class="form-control"
                     placeholder
+                    @blur="handleBlur()"
+                    @focus="handleFocus()"
                   />
                 </ValidationProvider>
               </div>
@@ -212,6 +218,7 @@
             </form>
           </ValidationObserver>
         </div>
+        </AwLoader>
       </div>
     </div>
   </div>
@@ -240,6 +247,7 @@ import { ValidationProvider, ValidationObserver, extend } from "vee-validate";
 import { required, email,alpha } from "vee-validate/dist/rules";
 import { useUser, useForgotPassword } from "@vue-storefront/magento";
 import { useUiState } from "~/composables";
+import AwLoader from "../pages/AwComponents/atoms/AwLoader.vue"
 import {
   customerPasswordRegExp,
   invalidPasswordMsg,
@@ -275,6 +283,25 @@ export default defineComponent({
     ValidationProvider,
     ValidationObserver,
     SfBar,
+    AwLoader
+  },
+  data(){
+    return {
+      showError: true,
+    }
+  },
+  computed:{
+    setShowError(){
+      return this.showError;
+    }
+  },
+  methods:{
+    handleBlur(){
+      this.showError = !this.showError;
+    },
+    handleFocus(){
+      this.showError = false;
+    }
   },
   setup() {
     const { isLoginModalOpen, toggleLoginModal, isRegisterFlagOn } =

@@ -1,27 +1,20 @@
 <template>
-  <div>
-    <SfAddressPicker
+  <div v-if="!billingAddresses">
+    <LoadingSpinner />
+  </div>
+  <div v-else class="shipping-provider">
+    <AwAddressPicker
       :selected="`${currentAddressId}`"
-      class="billing__addresses"
       @change="setCurrentAddress($event)"
     >
-      <SfAddress
+      <AwAddress
         v-for="billingAddress in billingAddresses"
         :key="userBillingGetters.getId(billingAddress)"
         :name="`${userBillingGetters.getId(billingAddress)}`"
-        class="billing__address"
       >
         <UserAddressDetails :address="billingAddress" />
-      </SfAddress>
-    </SfAddressPicker>
-    <SfCheckbox
-      :selected="value"
-      name="setAsDefault"
-      label="Use this address as my default one."
-      class="billing__setAsDefault"
-      @change="$emit('input', $event)"
-    />
-    <hr class="sf-divider">
+      </AwAddress>
+    </AwAddressPicker>
   </div>
 </template>
 
@@ -38,6 +31,9 @@ import {
   defineComponent,
 } from '@nuxtjs/composition-api';
 import UserAddressDetails from '~/components/UserAddressDetails.vue';
+import AwAddressPicker from '../../pages/AwComponents/molecules/AwAddressPicker.vue';
+import AwAddress from '../../pages/AwComponents/molecules/AwAddress.vue';
+import LoadingSpinner from "../LoadingSpinner.vue";
 
 export default defineComponent({
   name: 'UserBillingAddresses',
@@ -45,6 +41,9 @@ export default defineComponent({
     SfCheckbox,
     SfAddressPicker,
     UserAddressDetails,
+    AwAddressPicker,
+    AwAddress,
+    LoadingSpinner
   },
   props: {
     currentAddressId: {
@@ -80,6 +79,13 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.shipping-provider {
+    padding: 0 40px;
+    @media all and (max-width: 767px) {
+        padding: 0 0px;
+    }
+}
+
 .billing {
   &__address {
     margin-bottom: var(--spacer-base);

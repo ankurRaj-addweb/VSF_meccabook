@@ -39,10 +39,22 @@ export default defineComponent({
 
   setup(props, { emit }) {
     const { load, state, save } = usePaymentProvider();
-    const selectedMethod = ref(null);
+    const selectedMethod = ref('cashondelivery');
 
     onMounted(async () => {
       await load();
+      try {
+        await save({
+          paymentMethod: {
+            code: 'cashondelivery',
+          },
+        });      
+        console.log(selectedMethod.value,'selectedMethod');
+        emit('status', paymentMethod);
+      } catch (e) {
+        console.error(e);
+      }
+
     });
 
     const paymentMethods = computed(() => (Array.isArray(state.value) ? state.value.map((p) => ({
@@ -59,6 +71,7 @@ export default defineComponent({
         });
 
         selectedMethod.value = paymentMethod;
+        console.log(selectedMethod.value,'selectedMethod');
 
         emit('status', paymentMethod);
       } catch (e) {

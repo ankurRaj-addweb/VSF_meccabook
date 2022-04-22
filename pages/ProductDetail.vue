@@ -15,7 +15,7 @@
                 class="breadcrumb"
               >
                 <li class="breadcrumb-item">
-                  <nuxt-link :to="val.link ? (val.text!==breadcrumbs[0].text ? splitHTML(val.link).replace('/c','/c/'+ breadcrumbs[0].text.toLowerCase()) : splitHTML(val.link))  : '!#'"
+                  <nuxt-link :to="val.link ? (val.text!==breadcrumbs[0].text ? (index == 2 ? splitHTML(val.link).replace('/c', splitHTML(breadcrumbs[0].link)  + splitHTML(breadcrumbs[1].link.replace('/c',''))) : splitHTML(val.link).replace('/c','/c/' + breadcrumbs[0].text.toLowerCase())) : (index == 2 ? (splitHTML(val.link)).replace('/c','/c/' + breadcrumbs[1].link.replace('/c','')) : splitHTML(val.link)) )  : '!#'"
                     >{{ val.text === 'Kids' || val.text === 'Categories' ? "Books"
                     : val.text }}
                   </nuxt-link>
@@ -32,13 +32,14 @@
             <div class="d-lg-flex justify-content-between">
               <div class="view-product d-block">
                 <product-slider
-                  v-if="productGallery && productGallery.length > 0"
-                  :productGallery="productGallery"
+                  v-if="product.media_gallery"
+                  :productGallery="product.media_gallery"
                   :breadcrumbs="breadcrumbs"
+                  :imageIndex="product.media_gallery.findIndex((object) => object.url === product.image.url)"
                 />
                 <div v-else class="product-slider">
                   <div class="product-img" style="background-image: url()">
-                    <img src="'/meccabook/product-slide-img.png'" alt="" />
+                    <img src="/meccabook/product-slide-img.png" alt="" />
                   </div>
                 </div>
 
@@ -49,15 +50,11 @@
                   {{ productGetters.getName(product) }}
                 </h2>
 
-                <!-- <h2 class="pageInfo-title purple-text Acme-font ">
-                {{ productGetters.getName(product) }}
-              </h2> -->
-
                 <AuthorEdition :productsku="product.sku" />
                 <div class="rating">
                           <rating :rating="productGetters.getAverageRating(product)"></rating>
                 </div>
-                <p class="desc">{{ removeTags(productShortDescription) }}</p>
+                <p class="desc">{{productShortDescription ? removeTags(productShortDescription) : '' }}</p>
                 <div
                   class="stiky-onscroll"
                   :class="stickyHeader ? 'active-sticky' : null"
@@ -70,8 +67,9 @@
                       justify-content-between
                     "
                   >
-                    <div class="th-wrp d-flex align-items-center">
-                      <div class="thumb-img" 
+                    <div class="th-wrp d-flex align-items-center"
+                    @click="scrollToTop">
+                      <div class="thumb-img"
                         :class="breadcrumbs[0].text==='Kids' ? ('kidsbg' + (Math.floor(Math.random() * 8)+1)) : 'slider-img-bg'"
                       >
 													<img v-if="product && product.image && product.image.url" :src="product.image.url" alt="">
@@ -84,7 +82,6 @@
                         <StickyHeaderAuthor :productsku="product.sku" />
                       </div>
                     </div>
-
                     <div class="d-flex">
                          <PriceVariation
                               v-if="product.__typename == 'SimpleProduct'"
@@ -116,6 +113,7 @@
                               :key="option.uid"
                               class="product__colors desktop-only"
                             >
+
                               <AWPriceSelector
                                 v-for="(color, index) in option.values"
                                 :key="index"
@@ -169,13 +167,13 @@
                 <div
                   v-else-if="option.attribute_code === 'format'"
                   :key="option.uid"
-                  class="product__colors desktop-only"
+                  class="product__colors"
                 >
                   <AWPriceSelector
                     v-for="(color, index) in option.values"
                     :key="index"
                     :idx="index"
-                    :configPrice="priceStoreConfig ? priceStoreConfig[index] : '' "
+                    :configPrice="priceStoreConfig ? priceStoreConfig[productGetters.getSwatchData(color.swatch_data)] : '' "
                     :color="productGetters.getSwatchData(color.swatch_data)"
                     :productsku="product.sku"
                     :selected="productConfiguration[option.attribute_uid] === color.uid"
@@ -184,7 +182,9 @@
                   </AWPriceSelector>
                 </div>
               </template>
-                <div class="add-cart d-md-flex" v-if="product.stock_status == 'IN_STOCK' ">
+
+              <template v-if="product.stock_status == 'IN_STOCK' || !isAuthenticated">
+                <div class="add-cart d-md-flex">
                   <div
                     class="
                       inc-dcr-item
@@ -221,21 +221,32 @@
                     href="#"
                     class="btn btn-larg-yello text-uppercase"
                   >
-                    <span>Add to cart </span>
+                    <span>Add to cart</span>
                   </button>
 
                   <!-- configurableOptions pricevariation -->
                 </div>
-                <form class="out-of-stock" v-else>
+              </template>
+
+              <template v-if="product.stock_status == 'OUT_OF_STOCK' && isAuthenticated">
+                <!-- <form class="out-of-stock"> -->
 										<span class="stock-title text-uppercase d-block">currently out of Stock</span>
-										<div class="input-wrap">
-											<label for="email">Enter your email to be notified when available</label>
+										<div class="input-wrap notify_block">
+											<!-- <label for="email">Enter your email to be notified when available</label> -->
 											<div class="fld-wrp d-flex justify-content-between">
-												<input type="email" id="email" class="form-control" placeholder="Your email address" />
-												<a href="#!" class="btn"><span>submit</span></a>
+												<!-- <input type="email" id="email" class="form-control" placeholder="Your email address" /> -->
+                        <button class="btn" @click="notifyUser(email)">
+                          Notify Me
+                        </button>
+
+												<!-- <a href="" class="btn"><span>Notify Me</span></a> -->
 											</div>
+                      <div class="fld-wrp d-flex justify-content-between" v-if="notificationAdded">
+                        <span class="notify_success">You will be notified once this product is in stock again.</span>
+                      </div>
 										</div>
-								</form>
+								<!-- </form> -->
+              </template>
                 <div class="share-links d-md-flex align-items-center">
                   <div class="wishlist-wrap">
                     <AddToWishlist
@@ -282,7 +293,7 @@
               <div class="data-sheet d-lg-none">
                 <div class="control-link d-lg-flex">
                   <a
-                    href="#!"
+                    @click="e => e.target.classList.toggle('active')"
                     class="
                       btns-links
                       datasheet-btn
@@ -298,25 +309,9 @@
                   >
                   <div class="view-datasheet d-lg-none">
                     <datasheet v-if="product.sku" :productsku="product.sku" />
-                    <a
-                      href="#!"
-                      class="
-                        btns-links
-                        datasheet-btn
-                        inner-btn
-                        d-flex
-                        text-uppercase
-                        align-items-center
-                        justify-content-center
-                      "
-                      ><i class="arrow-icn"
-                        ><img src="/meccabook/icon-down.svg" alt="icn"
-                      /></i>
-                      data sheet</a
-                    >
                   </div>
                   <a
-                    href="#!"
+                    @click="e => e.target.classList.toggle('active')"
                     class="
                       btns-links
                       d-flex
@@ -387,8 +382,16 @@
                   <datasheet :productsku="product.sku" />
                 </div>
                 <div class="view-reviews" :class="[!isVisible ? 'active' : '']">
-                  <p class="desc">
-                    The first textbook of its kind in the English-speaking
+                <template v-if="magentoReviews && magentoReviews.length>0">
+                  <div v-for="review in magentoReviews" :key="review" class="review-wrap">
+                    <h5 v-if="review.user && review.user.display_name" class="list-rw"><span class="list-head">User : </span>
+                      <span class="list-desc">{{review.user.display_name}}</span></h5>
+                    <h6 v-if="review.title"><span class="list-head">Title :</span><span class="list-desc">{{review.title}}</span></h6>
+                    <p class="desc" v-if="review.content"><span class="list-head">Content :
+                      </span><span class="list-desc">{{review.content}}</span></p>
+                  </div>
+                  </template>
+                  <p class="desc" v-else>                    The first textbook of its kind in the English-speaking
                     world, Revelation draws on the most authoritative sources to
                     present a detailed yet refreshing guide to the life of the
                     Prophet and the story of Qur'anic revelation.
@@ -396,19 +399,15 @@
                 </div>
               </div>
               <div class="product-info">
-                <!-- <h4 class="info-title">About the book</h4> -->
                 <p class="desc product-desc" v-html="productDescription"></p>
               </div>
             </div>
           </div>
         </section>
-        <RecentlyViewProduct :breadcrumbs="breadcrumbs" />
-        <RecentlyViewProductMobile :breadcrumbs="breadcrumbs" />
+          <RecentlyViewProduct :breadcrumbs="breadcrumbs" />
+          <RecentlyViewProductMobile :breadcrumbs="breadcrumbs" />
         <LazyHydrate when-visible>
           <RelatedProduct :productsku="product.sku" :breadcrumbs="breadcrumbs" />
-        </LazyHydrate>
-        <LazyHydrate when-visible>
-          <UpsellProducts />
         </LazyHydrate>
       </div>
     </SfLoader>
@@ -417,27 +416,11 @@
 <script>
 import LazyHydrate from "vue-lazy-hydration";
 import axios from "axios";
-
-import Carousel from "vue-slick-carousel";
-import "vue-slick-carousel/dist/vue-slick-carousel.css";
-import { useUiHelpers, useUiState } from "~/composables";
 import AWPriceSelector from "./AwComponents/atoms/AWPriceSelector.vue";
-import { mapActions, mapGetters } from "vuex";
 
 import {
-  SfAddToCart,
-  SfBreadcrumbs,
-  SfButton,
   SfColor,
-  SfGallery,
-  SfHeading,
-  SfIcon,
   SfLoader,
-  SfPrice,
-  SfRating,
-  SfReview,
-  SfSelect,
-  SfTabs,
 } from "@storefront-ui/vue";
 import {
   useProduct,
@@ -447,6 +430,7 @@ import {
   reviewGetters,
   useUser,
   useWishlist,
+  userGetters
 } from "@vue-storefront/magento";
 import { onSSR } from "@vue-storefront/core";
 import {
@@ -458,7 +442,6 @@ import {
   defineComponent,
   onMounted,
   watch,
-  beforeMount,
 } from "@nuxtjs/composition-api";
 import { productData } from "~/helpers/product/productData";
 import cacheControl from "~/helpers/cacheControl";
@@ -467,7 +450,6 @@ import GroupedProductSelector from "~/components/Products/GroupedProductSelector
 import InstagramFeed from "~/components/InstagramFeed.vue";
 import MobileStoreBanner from "~/components/MobileStoreBanner.vue";
 import ProductAddReviewForm from "~/components/ProductAddReviewForm.vue";
-import UpsellProducts from "~/components/UpsellProducts";
 import RelatedProducts from "~/components/RelatedProducts";
 import HTMLContent from "~/components/HTMLContent";
 import AddToWishlist from "~/components/AddToWishlist";
@@ -476,7 +458,6 @@ import Datasheet from "./product-detail/DataSheet.vue";
 import AuthorEdition from "./product-detail/AuthorEdition.vue";
 import StickyHeaderAuthor from "./product-detail/StickyHeaderAuthor.vue";
 import PriceVariation from "./product-detail/PriceVariation.vue";
-import PriceVariationSticky from "./product-detail/PriceVariationSticky.vue";
 import RelatedProduct from "./product-detail/RelatedProduct.vue";
 import ShareButton from "./product-detail/ShareButton.vue";
 import RecentlyViewProduct from "./product-detail/RecentlyViewProduct.vue";
@@ -494,28 +475,14 @@ export default defineComponent({
     MobileStoreBanner,
     ProductAddReviewForm,
     RelatedProducts,
-    SfAddToCart,
-    SfBreadcrumbs,
-    SfButton,
     SfColor,
-    SfGallery,
-    SfHeading,
-    SfIcon,
     SfLoader,
-    SfPrice,
-    SfRating,
-    SfReview,
-    SfSelect,
-    SfTabs,
-    UpsellProducts,
     AddToWishlist,
-    Carousel,
     ProductSlider,
     Datasheet,
     AuthorEdition,
     StickyHeaderAuthor,
     PriceVariation,
-    PriceVariationSticky,
     RelatedProduct,
     ShareButton,
     axios,
@@ -529,8 +496,34 @@ export default defineComponent({
     "stale-when-revalidate": 5,
   }),
   transition: "fade",
+  methods: {
+    scrollToTop() {
+      window.scrollTo(0, 0);
+    },
+    notifyUser(email) {
+        let that = this;
+        axios.get("/addNotification?email=" + email + '&product='+atob(this.product.uid))
+          .then(response => {
+            that.notificationAdded = true;
+          })
+          .catch(function (error) {
+            console.log(error);
+          });;
+
+    }
+  },
+  beforeMount() {
+    document.body.classList.add('pro-detail');
+  },
+  beforeDestroy() {
+    document.body.classList.remove('pro-detail');
+  },
+  destroyed() {
+    document.body.classList.remove("kids-route");
+  },
   setup() {
     const qty = ref(1);
+    const notificationAdded = ref(false);
     const { product, id } = productData();
     const route = useRoute();
     const router = useRouter();
@@ -542,7 +535,7 @@ export default defineComponent({
       loading: reviewsLoading,
       addReview,
     } = useReview(`productReviews-${id}`);
-    const { isAuthenticated } = useUser();
+    const { user, isAuthenticated } = useUser();
     const { addItem: addItemToWishlist, isInWishlist } =
       useWishlist("GlobalWishlist");
     const { error: nuxtError } = useContext();
@@ -555,8 +548,7 @@ export default defineComponent({
     const alchemiaVisible = ref(false);
     const priceStoreConfig = ref(null);
     const recentlyViewProducts = ref([]);
-
-    const { toggleLoginModal } = useUiState();
+    const magentoReviews = ref(null);
 
     const productName = computed(()=> product.value.name);
     const psku = computed(() => product.value.sku);
@@ -603,6 +595,7 @@ export default defineComponent({
     const averageRating = computed(() =>
       reviewGetters.getAverageRating(baseReviews.value)
     );
+
     const breadcrumbs = computed(() => {
       const productCategories = product.value.categories;
       return productGetters.getBreadcrumbs(
@@ -688,17 +681,25 @@ export default defineComponent({
       });
     };
 
+    const fetchProductReview = () => {
+      axios.get("/productReviews?productSku="+product.value.sku)
+        .then(response => {
+          magentoReviews.value = response.data[0].data.response.reviews;
+      })
+    };
+
     watch(recentlyViewProducts, () => {
       localStorage.setItem('rvproducts', JSON.stringify(recentlyViewProducts.value));
     })
 
     onMounted(() => {
       window.addEventListener('scroll', handleScroll);
-      configProductOption();
+      if(product.value.__typename === "ConfigurableProduct") {
+        configProductOption();
+      }
       if (
-        product.value &&
-        product.value.categories &&
-        product.value.categories[0].name === "Kids"
+        breadcrumbs.value[0] &&
+        breadcrumbs.value[0].text === "Kids"
       ) {
         document.body.classList.add("kids-route");
       }
@@ -726,6 +727,7 @@ export default defineComponent({
       );
       document.head.appendChild(recaptchaScript);
 
+      fetchProductReview();
     });
 
       const AddrecentlyViewProducts = async () => {
@@ -736,7 +738,8 @@ export default defineComponent({
             'image': purl.value,
             'author': 'Shaykh Ahmad Ibn’Ajiba Al-Hasani',
             'price': pprice.value,
-            'url_key': pUrlKey.value
+            'url_key': pUrlKey.value,
+            'rating': averageRating.value,
           }
           const indexx = await recentlyViewProducts.value.findIndex(object => object.sku === Newproduct.sku);
           if(indexx === -1) {
@@ -805,15 +808,17 @@ export default defineComponent({
       axios
         .get(`https://meccamagento.addwebprojects.com/rest/V1/configoptions?sku=${psku}`)
           .then(response => {
-              priceStoreConfig.value = response.data[0].data
+              console.log(response.data[0].data);
+              let data = [];
+              for(let i = 0; i < response.data[0].data.length; i++){
+                  data[response.data[0].data[i].options.format] = response.data[0].data[i];
+              }
+
+              priceStoreConfig.value = data
           })
           .catch(error => {
             console.log(error);
           })
-    };
-
-    const getWindowURL = () => {
-      return window.location.href;
     };
 
     return {
@@ -859,8 +864,6 @@ export default defineComponent({
       windowScrollPosition,
       stickyHeader,
       splitHTML,
-      getWindowURL,
-      toggleLoginModal,
       alchemiaVisible,
       toggleAlchemia,
       priceStoreConfig,
@@ -871,12 +874,24 @@ export default defineComponent({
       psku,
       purl,
       pprice,
-      pUrlKey
+      pUrlKey,
+      email: userGetters.getEmailAddress(user.value),
+      notificationAdded,
+      magentoReviews,
+      fetchProductReview
     };
   },
 });
 </script>
 <style lang="scss" scoped>
+.notify_block {
+  margin-bottom: 15px;
+}
+
+.notify_success {
+  margin-top: 10px;
+  color: #2c354e;
+}
 #product {
   box-sizing: border-box;
   @include for-desktop {
@@ -1166,5 +1181,27 @@ p.desc p strong span {
     margin-bottom: 18px;
     font-weight: 400;
     font-family: "leksa", serif;
+}
+.product__colors {
+  @media all and (max-width: 767px) {
+    flex-wrap: wrap;
+  }
+}
+
+.view-reviews.active {
+
+  .review-wrap {
+    box-shadow: 0px 4px 4px rgb(0 0 0 / 6%);
+    margin-bottom: 20px;
+    padding: 15px;
+  }
+  h5,h6,p {
+    display: flex;
+    align-items: center;
+
+    // span {
+    //   margin-left: 20px;
+    // }
+  }
 }
 </style>

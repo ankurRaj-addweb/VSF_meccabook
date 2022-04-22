@@ -8,8 +8,8 @@
       />
     </div>
     <div class="details art-details">
-      <h4 class="event-title">{{card.title}}</h4>
-      <span class="sub-title d-block" v-html="removeTags(card.description.text)" />
+      <h4 class="event-title" v-if="card.title">{{card.title}}</h4>
+      <span class="sub-title d-block" v-if="card.sub_title" v-html="removeTags(card.sub_title)" />
     </div>
   </div>
 </template>
@@ -31,3 +31,21 @@ export default {
   },
 }
 </script>
+
+
+<style lang="scss" scoped>
+.artcard.card-wrao-info .art-card-view img {
+  @media (min-width: 768px) {
+    max-width: 295px;
+    height: 295px;  
+    width: 100%;
+  }
+}
+
+
+.artcard.card-wrao-info .art-card-view {
+  @media (max-width: 991px) {
+    width: unset !important;
+  }
+}
+</style>

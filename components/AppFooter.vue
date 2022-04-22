@@ -7,15 +7,15 @@
           <div
             class="feature-block"
             v-if="
-              getHomeContent &&
-              getHomeContent.components &&
-              getHomeContent.components.middle &&
-              getHomeContent.components.middle.four_column_content
+              home &&
+              home.components &&
+              home.components.middle &&
+              home.components.middle.four_column_content
             "
           >
             <div
               class="feature-wrap"
-              v-for="item in getHomeContent.components.middle
+              v-for="item in home.components.middle
                 .four_column_content"
               :key="item.image.url"
             >
@@ -34,10 +34,10 @@
         <div class="col-12">
           <div
             class="primary-footer"
-            v-if="getMenuContent && getMenuContent.footer"
+            v-if="menu && menu.footer"
           >
             <client-only>
-            <template v-for="item in getMenuContent.footer">
+            <template v-for="item in menu.footer">
               <div class="test" v-if="item.name" :key="item.name">
                 <div class="links-wrap">
                   <h4 class="links-tl">{{ item.name }}</h4>
@@ -53,21 +53,23 @@
                       </div>
 
                       <div
-                        v-else-if="
+                        v-if="
                           subitem[0].url == '/logout' && isAuthenticated
                         "
                         @click="logoutFunc"
                       >
                         <nuxt-link to="">{{ subitem[0].name }}</nuxt-link>
                       </div>
-
-                      <nuxt-link
-                        :to="subitem[0].url"
-                        v-else-if="
+                      
+                      <div
+                      v-if="
                           subitem[0].url == '/my-account' && isAuthenticated
                         "
-                        >{{ subitem[0].name }}</nuxt-link
+                        @click="handleAccountClick"
                       >
+
+                      <nuxt-link to="">{{ subitem[0].name }}</nuxt-link>
+                       </div>
                       <nuxt-link
                         :to="subitem[0].url"
                         v-else-if="
@@ -94,17 +96,17 @@
               <div class="klaviyo-form-WpCtWK"></div>
               <div class="social-links">
                 <div class="social-wrap">
-                  <a href="https://www.facebook.com/" target="_blank">
+                  <a href="https://www.facebook.com/meccabooks/" target="_blank">
                     <i class="icon-facebook"></i>
                   </a>
                 </div>
                 <div class="social-wrap">
-                  <a href="#">
+                  <a href="https://www.instagram.com/meccabooks/" target="_blank">
                     <i class="icon-insta"></i>
                   </a>
                 </div>
                 <div class="social-wrap">
-                  <a href="#">
+                  <a href="https://twitter.com/meccabooks" target="_blank">
                     <i class="icon-twitter"></i>
                   </a>
                 </div>
@@ -131,12 +133,11 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { onSSR } from "@vue-storefront/core";
 import { useUser } from "@vue-storefront/magento";
 import { SfFooter, SfList, SfImage, SfMenuItem } from "@storefront-ui/vue";
-import axios from "axios";
 import { useUiState } from "~/composables";
-import { useRoute, useRouter, useContext } from "@nuxtjs/composition-api";
+import { useRoute, useRouter, useContext, ssrRef } from "@nuxtjs/composition-api";
 
 export default {
   head() {
@@ -162,9 +163,26 @@ export default {
     const router = useRouter();
     const { localePath } = useContext();
 
+    const home = ssrRef(null);
+    const menu = ssrRef(null);
+
+    const fetchHome = async () => {
+      let homeURL = process.env.DEV_MECCABOOK + '/api/content/56'
+      let data = await fetch(homeURL).then(res => res.json());
+      return data;
+    };
+
+    const fetchMenu = async () => {
+      let menuURL = process.env.DEV_MECCABOOK + '/api/menu'
+      let data = await fetch(menuURL).then(res => res.json());
+      return data;
+    };
+
+
+
     const handleAccountClick = async () => {
       if (isAuthenticated.value) {
-        await router.push("/my-account");
+        await router.push("/my-account/manage-account");
       } else {
         toggleLoginModal();
       }
@@ -182,11 +200,18 @@ export default {
       return;
     };
 
+    onSSR(async () => {
+      home.value = await fetchHome();
+      menu.value = await fetchMenu();
+    });
+
     return {
       isAuthenticated,
       handleAccountClick,
       showRegisterForm,
       logoutFunc,
+      home,
+      menu
     };
   },
   data() {
@@ -199,16 +224,6 @@ export default {
       isMobile: false,
       desktopMin: 1024,
     };
-  },
-  computed: {
-    ...mapGetters("drupalcms", ["getHomeContent", "getMenuContent"]),
-  },
-  methods: {
-    ...mapActions("drupalcms", ["fetchHome", "fetchMenu"]),
-  },
-  async mounted() {
-    await this.fetchHome();
-    await this.fetchMenu();
   },
 };
 </script>

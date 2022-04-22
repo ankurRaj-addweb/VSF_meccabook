@@ -18,13 +18,13 @@
     </AwTab>
 
     <!-- Password reset -->
-    <AwTab title="Password change">
+    <!-- <AwTab title="Password change">
       <h2 class="sec-title">
         {{ $t('Change password your account') }}:<br>
       </h2>
 
       <PasswordResetForm @submit="updatePassword" />
-    </AwTab>
+    </AwTab> -->
   </AwTabs>
 </template>
 

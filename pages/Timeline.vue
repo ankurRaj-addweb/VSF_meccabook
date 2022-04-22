@@ -5,17 +5,12 @@
       <hr />
       <div
         class="horizontally-scrolled-items"
-        v-if="
-          getrelandingPage &&
-          getrelandingPage.components &&
-          getrelandingPage.components.middle
-        "
+        v-if="timeline"
       >
         <template>
           <div
             class="item flag"
-            v-for="(item, idx) in getrelandingPage.components.middle
-              .timeline_component"
+            v-for="(item, idx) in timeline"
             :key="idx"
           >
             <i></i>
@@ -33,27 +28,19 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
 export default {
-  data() {
-    return {
-      g: "hello",
-    };
+  props: {
+    timeline: {
+      type: [Object, Array],
+      default: null
+    }
   },
-  computed: {
-    ...mapGetters("drupalcms", ["getrelandingPage"]),
-  },
-
   methods: {
-    ...mapActions("drupalcms", ["fetchlandingpage"]),
     removeTags(str) {
       if (str === null || str === "") return false;
       else str = str.toString();
       return str.replace(/(<([^>]+)>)/gi, "");
     },
-  },
-  async mounted() {
-    await this.fetchlandingpage();
   },
 };
 </script>

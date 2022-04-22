@@ -106,7 +106,7 @@
                 width: 64%;
             }
             @media all and (min-width: 1200px) {
-                width: 54%;
+                width: 64%;
             }
         }
         .event-post {
@@ -189,6 +189,7 @@
     }
     @media all and (min-width:1200px) {
         width: 53%;
+        max-width: 295px;
     }
     img {
         width: 100%;
@@ -287,8 +288,10 @@ h4.followUs {
 }
 
 section.content-blog.about-us-sec {
-    margin-top: 77px;
-    padding-bottom: 90px;
+    @media all and (min-width: 1200px) {
+        margin-top: 77px;
+        padding-bottom: 90px;
+    }
 }
 
 .gallery-blog {
@@ -372,5 +375,188 @@ p.desc.product-desc {
         iframe {
             width: 100%;
         }
+    }
+}
+
+body.pro-detail {
+    overflow-x: hidden;
+}
+
+.book-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .book-main-wrapper {
+        position: relative;
+        display: flex;
+        width: 36%;
+        // flex-direction: column;
+        margin-right: 4%;
+        height: 23.4375VW;
+        flex-wrap: wrap;
+        .close-btn {
+            display: none;
+            position: absolute;
+            right: -16px;
+            top: -16px;
+        }
+        .book-cover {
+            display: flex;
+            justify-content: flex-end;
+            position: relative;
+            width: 26.041666666666668VW;
+            height: 20.833333333333336VW;
+            left: -10.020833VW;
+            top: 10px;
+            transition: all 0.9s ease-in-out;
+            -webkit-perspective: 67.70833333333334VW;
+            perspective: 67.70833333333334VW;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            .pageprev {
+                position: absolute;
+                -webkit-transform-style: preserve-3d;
+                transform-style: preserve-3d;
+                -webkit-transition-property: -webkit-transform;
+                transition-property: transform;
+                width: 13.90625VW;
+                height: 100%;
+                left: 100%;
+                -webkit-transform-origin: left center;
+                transform-origin: left center;
+            }
+            #first,
+            #first .back {
+                -webkit-transform: rotateY(180deg);
+                transform: rotateY(180deg);
+            }
+            #first {
+                z-index: 102;
+            }
+            #secondprev {
+                z-index: 103;
+                transition: transform 0.8s ease-in-out;
+            }
+            #thirdprev .content {
+                width: 20.833333333333336VW;
+            }
+            #fourthprev {
+                z-index: 101;
+            }
+            .pageprev>div,
+            .outer,
+            .content,
+            .helper-class-to-make-bug-visbile {
+                position: absolute;
+                height: 100%;
+                width: 100%;
+                top: 0;
+                left: 0;
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+            }
+            .pageprev>div {
+                width: 100%;
+                -webkit-transform-style: preserve-3d;
+                transform-style: preserve-3d;
+            }
+            .back {
+                -webkit-transform: rotateY(-180deg);
+                transform: rotateY(-180deg);
+            }
+            .outer {
+                width: 100%;
+                overflow: hidden;
+                z-index: 999;
+            }
+            /* problematic class: `.content` */
+            .content {
+                width: 200%;
+                background: black;
+            }
+            img {
+                height: 100%;
+            }
+        }
+        .previewbtn-wrapper {
+            //     position: absolute;
+            //      bottom: 0;
+            //     z-index: 999;
+            //   left: 46%;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-top: 25px;
+            justify-content: center;
+            img {
+                width: 25px;
+                margin-right: 10px;
+            }
+        }
+    }
+    .section-right {
+        display: flex;
+        flex-direction: column;
+        width: calc(100% - 36%);
+        position: relative;
+        left: 0;
+        transition: all 0.9s ease-out;
+    }
+}
+
+.bookOpened {
+    .previewbtn {
+        display: none;
+    }
+    .book-wrapper {
+        .book-main-wrapper {
+            .close-btn {
+                display: block !important;
+                z-index: 999 !important;
+                transform-style: unset !important;
+                backface-visibility: visible !important;
+                left: unset !important;
+                right: 14.322916666666666VW !important;
+                top: -25px !important;
+            }
+            .book-cover {
+                visibility: inherit;
+                cursor: pointer;
+                left: 48%;
+                z-index: 1007;
+                outline: none;
+            }
+        }
+        .section-right {
+            left: 156.25VW;
+        }
+    }
+}
+
+.zoom {
+    .book-wrapper {
+        .book-main-wrapper {
+            .book-cover {
+                transform: scale(1.6);
+                #fourthprev {
+                    &::before {
+                        opacity: 80%;
+                        transform: scale(5.5);
+                    }
+                }
+            }
+        }
+        .close-btn {
+            color: #fff;
+        }
+    }
+}
+
+.openBook {
+    #secondprev {
+        transform: rotateY(-180deg);
+    }
+    .book-cover {
+        left: -5.020833VW !important;
     }
 }

@@ -5,16 +5,6 @@
       :visible="isCartSidebarOpen"
       class="sf-sidebar--right"
     >
-      <!-- <template #circle-icon="{ close }">
-        <div class="close-icon" @click="close">
-          <span class="arrow-icn">
-            <img src="/meccabook/icon-long-arrow-navi.svg" alt="" />
-          </span>
-        </div>
-      </template> -->
-      <SfLoader v-if="isLoaderVisible" :loading="isLoaderVisible">
-        <div />
-      </SfLoader>
       <template #content-top>
         <SfProperty
           v-if="totalItems"
@@ -56,7 +46,7 @@
                 }}</span>
               </div>
               <div class="included">
-                  <SfQuantitySelector
+                  <AwQuantitySelector
                     :disabled="loading"
                     :qty="cartGetters.getItemQty(product)"
                     @input="updateItemQty({ product, quantity: $event })"
@@ -84,7 +74,7 @@
             <span
               >Subtotal <sub>( {{ totalItems }} items)</sub></span
             >
-            <span>{{ $n(totals.subtotal, "currency") }}</span>
+            <span>{{ $n(productPriceTotal, "currency") }}</span>
           </div>
         </div>
         <div v-else key="empty-cart" class="empty-cart">
@@ -120,12 +110,12 @@
               >
               <button @click="toggleCartSidebar" style="width: -webkit-fill-available;"
                 class="btn CartBtn close-btn d-flex align-items-center justify-content-center"
-                ><img src="assets/images/icon-long-arrow-right.svg" alt="" />
+                ><img src="/meccabook/icon-long-arrow-right.svg" alt="" />
                 <span>close</span></button
               >
             </div>
           </div>
-          <div v-else>
+          <div class="btn-wrp" v-else>
             <!-- <SfButton
               class="sf-button--full-width color-primary"
               @click="toggleCartSidebar"
@@ -139,7 +129,9 @@
               >
               <button @click="toggleCartSidebar" style="width: -webkit-fill-available;"
               class="btn CartBtn close-btn d-flex align-items-center justify-content-center"
-              ><span>close</span></button>
+              >
+              <img src="/meccabook/icon-long-arrow-right.svg" alt="" />
+              <span>close</span></button>
           </div>
         </transition>
       </template>
@@ -157,7 +149,7 @@ import {
   SfPrice,
   SfCollectedProduct,
   SfImage,
-  SfQuantitySelector,
+  // SfQuantitySelector,
 } from "@storefront-ui/vue";
 import {
   computed,
@@ -175,6 +167,7 @@ import { onSSR } from "@vue-storefront/core";
 import { useUiState, useUiNotification } from "~/composables";
 import CouponCode from "./CouponCode.vue";
 import AwSidebar from '../pages/AwComponents/organisms/AwSidebar.vue'
+import AwQuantitySelector from '../pages/AwComponents/molecules/AwQuantitySelector.vue'
 
 export default defineComponent({
   watch: {
@@ -190,7 +183,7 @@ export default defineComponent({
     SfPrice,
     SfCollectedProduct,
     SfImage,
-    SfQuantitySelector,
+    AwQuantitySelector,
     CouponCode,
   },
   setup() {
@@ -216,6 +209,13 @@ export default defineComponent({
     const visible = ref(false);
     const isLoaderVisible = ref(false);
     const tempProduct = ref();
+    const productTotalwiithoutTax = ref(0);
+
+    const productPriceTotal = computed(() => {
+      productTotalwiithoutTax.value = 0;
+      products.value.map((element) => productTotalwiithoutTax.value += element.prices.row_total.value) 
+      return productTotalwiithoutTax.value.toFixed(2);
+    });
 
     onSSR(async () => {
       await loadCart();
@@ -255,6 +255,8 @@ export default defineComponent({
       cartGetters,
       getAttributes,
       getBundles,
+      productTotalwiithoutTax,
+      productPriceTotal
     };
   },
 });
@@ -455,5 +457,13 @@ height: 24px;
 }
 .btn.CartBtn.close-btn {
   width: 100%;
+}
+.item-prices {
+  font-size: 16px;
+}
+.btn-wrp {
+  @media all and (min-width: 992px) {
+    width: 380px;
+  }
 }
 </style>

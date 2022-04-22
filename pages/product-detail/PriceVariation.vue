@@ -1,15 +1,5 @@
 <template>
-  <div v-if="getproductConfigurable && getproductConfigurable.code == 200" style="display: flex;">
-  <ul v-for="(product, index) in getproductConfigurable.data" :key="index"
-    class="boxes-list text-center text-md-left d-flex justify-content-between flex-wrap"
-  >
-    <li @click="putActiveButtonID(product.product_id)" class="box box-btn" :class="activeBtn == product.product_id ? 'active' : null">
-      <span v-if="product.options && product.options.format" v- class="quality d-block">{{ product.options.format }}</span>
-      <span v-if="product.price" class="price d-block">${{ product.price }}</span>
-    </li>
-  </ul>
-  </div>
-  <div v-else>
+  <div>
   <ul
     class="boxes-list text-center text-md-left d-flex justify-content-between flex-wrap"
   >
@@ -23,14 +13,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
 export default {
-    data() {
-      return {
-        activeBtn: null,
-      }
-    },
-    props:  {
+  props:  {
     productsku: {
       type: String,
       default: null
@@ -39,20 +23,6 @@ export default {
       type: String,
       default: null
     }
-    },
-   computed: {
-    ...mapGetters("drupalcms", ["getproductConfigurable"]),
   },
-  methods: {
-    ...mapActions("drupalcms", ["fetchProductConfigurable"]),
-    putActiveButtonID (val) {
-      this.activeBtn = val;
-    }
-  },
-  mounted() {
-    this.fetchProductConfigurable(this.productsku);
-  
-  },
-    
 }
 </script>

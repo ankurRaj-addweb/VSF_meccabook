@@ -29,12 +29,6 @@
           </div>
         </div>
       </div>
-       <div class="knowledge-point">
-          <a href="#">
-            <span class="knowledge-text">Knowledge points</span>
-            <i class="icon-ribbon"></i>
-          </a>
-       </div>
     </section>
         <!-- Browse Section End -->
     <BrowseBySubject v-if="getBrowseBySubject && getBrowseBySubject[0] && getBrowseBySubject[0].data" :browseBySubject="getBrowseBySubject[0].data"/>
@@ -54,72 +48,28 @@
       
       </div>
     </section>
-        <!-- Follow Us Section Start -->
-    <section class="followus-sec d-none d-md-block">
+    <!-- Follow Us Section Start -->
+    <section class="followus-sec mt-4">
       <div class="container">
         <h4 class="followUs text-center">Follow us @MeccaBooks</h4>
       </div>
-      <div class="folow-info">
-        <ul class="follow-list">
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img1.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img2.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img3.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img1.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img2.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img3.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img1.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img2.jpg" alt="image"
-            /></a>
-          </li>
-          <li>
-            <a href="#!"
-              ><img src="/meccabook/follow-img3.jpg" alt="image"
-            /></a>
-          </li>
-        </ul>
-      </div>
+      <!-- <follow-info></follow-info> -->
+      <div class="powr-instagram-feed" id="dd6f9094_1648207969"></div><script src="https://www.powr.io/powr.js?platform=vuejs"></script>
     </section>
   </div>
 </template>
+
 <script>
 import BrowseBySubject from "../pages/home/BrowseBySubject.vue";
 import DonatelistBlog from "../pages/home/DonatelistBlog.vue";
+import FollowInfo from "../pages/home/FollowInfo.vue"
 import { mapActions, mapGetters } from "vuex";
 export default{
   name: "errorLayout",
   components:{
     BrowseBySubject,
     DonatelistBlog,
+    FollowInfo
   },
   computed: {
     ...mapGetters("drupalcms", ["getBrowseBySubject", "getHomeContent"]),
@@ -133,6 +83,8 @@ export default{
   },
 };
 </script>
+
+
 <style lang="scss" scoped>
 @import "~@storefront-ui/vue/styles";
 .blogWrap-sec{

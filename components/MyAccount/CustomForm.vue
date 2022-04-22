@@ -5,29 +5,7 @@
       class="form"
       @submit.prevent="handleSubmit(submitForm)"
     >
-      <div class="coln-two d-md-flex justify-content-between">
-        <div class="input-wrap">
-          <label class="text-uppercase">email address*</label>
-          <input type="text" class="form-control" placeholder="">
-        </div>
-        <div class="input-wrap">
-        <ValidationProvider
-          v-slot="{ errors }"
-          rules="required|min:8"
-          name="telephone"
-          class="form__element"
-        >
-        <AwInput
-          v-model="form.telephone"
-          name="telephone"
-          label="Mobile Phone*"
-          required
-          :valid="!errors[0]"
-          :error-message="errors[0]"
-        />
-      </ValidationProvider>
-        </div>
-      </div>
+      
       <div class="coln-two d-md-flex justify-content-between">
         <div class="input-wrap">
         <ValidationProvider
@@ -40,7 +18,6 @@
             v-model="form.firstname"
             name="firstname"
             label="First Name*"
-            required
             :valid="!errors[0]"
             :error-message="errors[0]"
           />
@@ -57,13 +34,31 @@
             v-model="form.lastname"
             name="lastname"
             label="Last Name*"
-            required
             :valid="!errors[0]"
             :error-message="errors[0]"
           />
         </ValidationProvider>
         </div>
       </div>
+      <div class="coln-two d-md-flex justify-content-between">
+
+<div class="input-wrap input-shipping">
+<ValidationProvider
+v-slot="{ errors }"
+rules="required|numeric|min:8"
+name="telephone"
+class="form__element"
+>
+<AwInput
+v-model="form.telephone"
+name="telephone"
+label="Mobile Phone*"
+:valid="!errors[0]"
+:error-message="errors[0]"
+/>
+</ValidationProvider>
+</div>
+</div>
       <div class="coln-two d-md-flex justify-content-between">
         <div class="input-wrap input-shipping">
           <ValidationProvider
@@ -78,8 +73,7 @@
               class="form-control"
               ref="streett"
               name="street"
-              label="Shipping Addresss*"
-              required
+              label="Shipping Addresss*"   
               :valid="!errors[0]"
               :error-message="errors[0]"
             />
@@ -97,7 +91,6 @@
             label="Country*"
             name="country"
             class="form__select sf-select--underlined select-input"
-            required
             :valid="!errors[0]"
             :error-message="errors[0]"
             @input="searchCountry({ id:$event })"
@@ -113,13 +106,13 @@
         </ValidationProvider>
         </div>
       </div>
+      
       <div class="coln-two d-md-flex justify-content-between">
         <div class="input-wrap input-shipping">
           <AwInput
           v-model="form.street"
           name="apartment"
-          label="shipping address line 2"
-          required
+          label="shipping address line 2" 
           class="form__element"
         />
         </div>
@@ -128,15 +121,14 @@
         <div class="input-wrap input-zip">
         <ValidationProvider
           v-slot="{ errors }"
-          rules="required|min:4"
+          rules="required|alpha_num|min:4"
           name="postcode"
           class="form__element"
         >
           <AwInput
             v-model="form.postcode"
             name="postcode"
-            label="Zip Code*"
-            required
+            label="Zip Code*"         
             :valid="!errors[0]"
             :error-message="errors[0]"
           />
@@ -145,14 +137,13 @@
         <div class="input-wrap input-city">
           <ValidationProvider
           v-slot="{ errors }"
-          rules="required|min:2"
+          rules="required|alpha|min:2"
           class="form__element"
         >
           <AwInput
             v-model="form.city"
             name="city"
             label="City*"
-            required
             :valid="!errors[0]"
             :error-message="errors[0]"
           />
@@ -228,7 +219,7 @@ import {
   useAddresses,
   useCountrySearch,
 } from '@vue-storefront/magento';
-import { required, min, oneOf } from 'vee-validate/dist/rules';
+import { required, min, oneOf,numeric,alpha,alpha_num } from 'vee-validate/dist/rules';
 import {
   ValidationProvider,
   ValidationObserver,
@@ -249,7 +240,18 @@ extend('required', {
   ...required,
   message: 'This field is required',
 });
-
+extend('alpha', {
+  ...alpha,
+  message: 'Please Enter a valid city Name',
+});
+extend('alpha_num', {
+  ...alpha_num,
+  message: 'Please Enter a valid Zip code',
+});
+extend('numeric', {
+  ...numeric,
+  message: 'Please Enter a Valid Mobile Number',
+});
 extend('min', {
   ...min,
   message: 'The field should have at least {length} characters',
@@ -304,7 +306,7 @@ export default defineComponent({
       autocomplete.addListener("place_changed", () => {
         const place = autocomplete.getPlace();
         console.log(place);
-        this.form.street = place.formatted_address;
+        this.form.apartment = place.formatted_address;
 
         for(var i = 0; i < place.address_components.length; i += 1) {
           var addressObj = place.address_components[i];
@@ -312,19 +314,19 @@ export default defineComponent({
             if (addressObj.types[j] === 'route') {
               console.log(addressObj.types[j]); // confirm that this is 'state'
               console.log(addressObj.short_name); // confirm that this is the state name
-              this.form.apartment = addressObj.long_name;
+              this.form.street = addressObj.long_name;
             }
             if (addressObj.types[j] === 'sublocality_level_2') {
               console.log(addressObj.types[j]); // confirm that this is 'state'
               console.log(addressObj.short_name); // confirm that this is the state name
-              this.form.apartment += ", " + addressObj.long_name;
+              this.form.street += ", " + addressObj.long_name;
             }
             // if (addressObj.types[j] === 'administrative_area_level_1') {
             //   console.log(addressObj.types[j]); // confirm that this is 'state'
             //   console.log(addressObj.short_name); // confirm that this is the state name
             //   this.form.region.region = addressObj.long_name;
             // }
-            if (addressObj.types[j] === 'administrative_area_level_2') {
+            if (addressObj.types[j] === 'locality') {
               console.log(addressObj.types[j]); // confirm that this is 'state'
               console.log(addressObj.long_name); // confirm that this is the state name
               this.form.city = addressObj.long_name;

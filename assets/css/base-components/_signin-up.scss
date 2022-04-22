@@ -14,9 +14,9 @@
         max-width: 715px;
         border-radius: 20px;
         padding: 75px 50px 45px;
-        max-height: 100vh;
         overflow: auto;
         margin: auto;
+        max-height: 100vh;
     }
     @media all and (max-width: 767px) {
         max-width: 100%;
@@ -72,6 +72,7 @@ h2.sign-title {
         background: white;
         margin: 10px 0;
         padding: 7px 19px;
+        max-width: 587.9px;
     }
     label {
         @include fontsize(16px);
@@ -91,8 +92,7 @@ h2.sign-title {
 
 .forget-pwd {
     margin-bottom: 20px;
-    .forget-pwd-link
-    {
+    .forget-pwd-link {
         @include fontsize(14px);
         letter-spacing: -0.035em;
         text-decoration-line: underline;

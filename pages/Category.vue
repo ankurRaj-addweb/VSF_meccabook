@@ -1,7 +1,7 @@
 <template>
 <AwLoader :class="{ loading }" :loading="loading">
   <div class="wrapper-blog" v-if="!loading">
-    <section class="banner product-list-banner">
+    <section class="banner product-list-banner" :style=" `background-image: url(` + bgCoverImage + `)`">
       <div class="container">
         <div class="row">
           <div class="col-12">
@@ -16,15 +16,9 @@
           </div>
         </div>
       </div>
-      <div class="knowledge-point">
-        <a href="#">
-          <span class="knowledge-text">Knowledge points</span>
-          <i class="icon-ribbon"></i>
-        </a>
-      </div>
     </section>
     <section class="categories"
-     :style="$route.path.includes('kids') ? 'background-image: url(/meccabook/kids-bg-img.png)' : 'background-image: url()'"
+     :style="$route.path.includes('kids') ? 'background-image: url(/meccabook/kids-bg-img.png)' : bgCoverImage"
     >
       <div class="container">
         <h1 class="ban-title">{{ heading }}</h1>
@@ -49,95 +43,11 @@
                 <LazyHydrate when-visible>
                   <CategorySidebarMenu :no-fetch="true" />
                 </LazyHydrate>
-                <div class="filter_holder">
-                <div class="filters desktop-only">
-                  <h2 class="fl-title">Filter by</h2>
-                  <AwAccordion>
-
-                  <div
-                    v-for="(facet, i) in facets"
-                    :key="i"
-                  >
-                  
-                    <SfHeading
-                      :key="`filter-title-${facet.id}`"
-                      :level="4"
-                      :title="facet.label"
-                      class="filters__title sf-heading--left"
-                    />
-                    <AwAccordionItem>
-                    <div v-if="facet.id === 'price'">
-                      <SfRadio
-                        v-for="option in facet.options"
-                        :key="`${facet.id}-${option.value}`"
-                        :label="`${option.id}${option.count ? ` (${option.count})` : ''}`"
-                        :value="option.value"
-                        :selected="isFilterSelected(facet, option)"
-                        name="priceFilter"
-                        @change="() => selectFilter(facet, option)"
-                      />
-                    </div>
-                    <div v-else>
-                      <SfFilter
-                        v-for="option in facet.options"
-                        :key="`${facet.id}-${option.value}`"
-                        :label="option.id + `${option.count ? ` (${option.count})` : ''}`"
-                        :selected="isFilterSelected(facet, option)"
-                        class="filters__item"
-                        @change="() => selectFilter(facet, option)"
-                      />
-                    </div>
-                    </AwAccordionItem>
-                  </div>
-                  </AwAccordion>
-                </div>
-
-              <SfAccordion class="filters smartphone-only">
-                <div
-                  v-for="(facet, i) in facets"
-                  :key="i"
-                >
-                  <SfAccordionItem
-                    :key="`filter-title-${facet.id}`"
-                    :header="facet.label"
-                    class="filters__accordion-item"
-                  >
-                    <SfFilter
-                      v-for="option in facet.options"
-                      :key="`${facet.id}-${option.id}`"
-                      :label="option.id"
-                      :selected="isFilterSelected(facet, option)"
-                      class="filters__item"
-                      @change="() => selectFilter(facet, option)"
-                    />
-                  </SfAccordionItem>
-                </div>
-              </SfAccordion>
-              <template>
-                <div class="filters__buttons wrap">
-                  <SfButton
-                    class="btn banner-btn"
-                    @click="applyFilters()"
-                  >
-                    <span>{{ $t('Done') }}</span>
-                  </SfButton>
-                  <SfButton
-                    class="btn continue-btn"
-                    @click="applyFilters({})"
-                  >
-                   <span> {{ $t('Clear all') }}</span>
-                  </SfButton>
-                </div>
-              
-              
-              </template>
-
-              </div>
               </div>
             </div>
           </div>
           <div class="col-xl-9 col-lg-12">
-            <div class="filters-wrap ml-xl-4">
+            <div class="filters-wrap">
               <div class="filter-left">
                 <div class="view-btns">
                 <div class="prev-page">
@@ -177,11 +87,9 @@
 
                 <div class="product-show-nav">
                   <div
-                    v-show="pagination.totalPages > 1"
                     class="products__show-on-page"
                   >
-                    <!-- <div on-interaction class="items-select"> -->
-                    <AwSelect
+                     <AwSelect
                       :value="pagination.itemsPerPage.toString()"
                       class="items-select"
                       @input="th.changeItemsPerPage"
@@ -194,7 +102,6 @@
                         {{ 'Show ' + option + ' per page' }}
                       </AwSelectOption>
                     </AwSelect>
-                    <!-- </div> -->
                   </div>
                   <div class="navbar__sort">
                     <div on-interaction class="items-sort">
@@ -211,19 +118,13 @@
                           {{ $t("Sort by") }}
                           {{ $t(option.label) }}
                         </AwSelectOption>
-                        
+
                       </AwSelect>
                     </div>
                   </div>
                 </div>
-                
-                <div class="filter-btn">
-                  <AwButton @click="toggleFilterSidebar">
-                    <i class="icon-top"></i>
-                  </AwButton>
-                </div>
               </div>
-                
+
               <div class="filter-right">
                 <div class="page-details">
                   <p>
@@ -241,353 +142,120 @@
                 </div>
               </div>
             </div>
-              <div>
-                <transition-group
-                  v-if="isCategoryGridView"
-                  appear
-                  name="products__slide"
-                  tag="div"
-                  class="top-block active-grid ml-xl-4"
+            <transition-group
+            v-if="isCategoryGridView"
+            appear
+            name="products__slide"
+            tag="div"
+            class="top-block active-grid"
+          >
+            <AwProductCard
+              v-for="(product, i) in products"
+              :key="productGetters.getSlug(product)"
+              v-e2e="'category-product-card'"
+              :style="{ '--index': i }"
+              :title="productGetters.getName(product)"
+              :author="product.author_3nd"
+              :image="productGetters.getProductThumbnailImage(product)"
+              :regular-price="$n(productGetters.getPrice(product).regular, 'currency')"
+              :special-price="productGetters.getPrice(product).special && $n(productGetters.getPrice(product).special, 'currency')"
+              :score-rating="productGetters.getAverageRating(product)"
+              :reviews-count="productGetters.getTotalReviews(product)"
+              :show-add-to-cart-button="true"
+              :is-added-to-cart="isInCart({ product })"
+              :is-in-wishlist="isInWishlist({ product })"
+              :wishlist-icon="isAuthenticated ? 'heart' : ''"
+              :is-in-wishlist-icon="isInWishlist({product}) ? 'active' : ''"
+              :getHomeLatest="getHomeLatest"
+              :stockStatus="product.stock_status"
+              :stockLeft="product.only_x_left_in_stock"
+              :product="productGetters.getId(product)"
+              :price="productGetters.getPrice(product)"
+              :link="
+                localePath(
+                  `/p/${productGetters.getProductSku(
+                    product
+                  )}${productGetters.getSlug(product, product.categories[0])}`
+                )
+              "
+              @click:wishlist="addItemToWishlist(product)"
+              @click:add-to-cart="addItemToCart({ product, quantity: 1 })"
+            >
+            <template #rating>
+                <rating :rating="productGetters.getAverageRating(product)" class="rating"></rating>
+            </template>
+            </AwProductCard>
+          </transition-group>
+          <transition-group
+            v-else
+            appear
+            name="products__slide"
+            tag="div"
+            class="top-block"
+          >
+            <AwProductCardHorizontal
+              v-for="(product, i) in products"
+              :key="productGetters.getSlug(product)"
+              :style="{ '--index': i }"
+              :title="productGetters.getName(product)"
+              :author="product.author_3nd"
+              :description="removeTags(productGetters.getDescription(product))"
+              :image="productGetters.getProductThumbnailImage(product)"
+              :regular-price="$n(productGetters.getPrice(product).regular, 'currency')"
+              :special-price="productGetters.getPrice(product).special && $n(productGetters.getPrice(product).special, 'currency')"
+              :score-rating="productGetters.getAverageRating(product)"
+              :reviews-count="productGetters.getTotalReviews(product)"
+              :is-in-wishlist="isInWishlist({product})"
+              :is-in-wishlist-icon="isInWishlist({product})? 'active' : ''"
+              :wishlist-icon="isAuthenticated ? 'heart' : ''"
+              :getHomeLatest="getHomeLatest"
+              :stockStatus="product.stock_status"
+              :stockLeft="product.only_x_left_in_stock"
+              :product="productGetters.getId(product)"
+              :price="productGetters.getPrice(product)"
+              :link="
+                localePath(
+                  `/p/${productGetters.getProductSku(
+                    product
+                  )}${productGetters.getSlug(product, product.categories[0])}`
+                )
+              "
+              @click:wishlist="addItemToWishlist(product)"
+              @click:add-to-cart="addItemToCart({ product, quantity: 1 })"
+            >
+             <template #rating>
+                <rating :rating="productGetters.getAverageRating(product)" class="rating"></rating>
+              </template>
+              <template #configuration>
+                <SfProperty
+                  class="desktop-only"
+                  name="Size"
+                  value="XS"
+                  style="margin: 0 0 1rem 0"
+                />
+                <SfProperty
+                  class="desktop-only"
+                  name="Color"
+                  value="white"
+                />
+              </template>
+              <template #actions>
+                <SfButton
+                  class="sf-button--text desktop-only"
+                  style="margin: 0 0 1rem auto; display: block"
                 >
-                  <div
-                    v-for="(product, i) in products"
-                    :key="productGetters.getSlug(product)"
-                    :style="{ '--index': i }"
-                    class="category-wrap listcat-vw vrt-category"
-                  >
-                  <!-- {{ product.stock_status }} -- {{ product.only_x_left_in_stock }} -->
-                  <!-- {{productGetters.getPrice(product).regular}} - {{productGetters.getPrice(product).special}} -->
-
-                  <badge v-if="getHomeLatest" :price="productGetters.getPrice(product)" :stockStatus="product.stock_status" :stockLeft="product.only_x_left_in_stock" :latest="getHomeLatest" :product="productGetters.getId(product)"></badge>
-                  <button class="linked-for-detailpage" @click="redirectToDetailPage(product)" ></button>
-                    <div
-                      class="category-img mob-lt-hide var-hor-category-img" 
-                      :class="$route.path.includes('kids') ? ('kidsbg' + (Math.floor(Math.random() * 8)+1)) : 'slider-img-bg'"
-                    >
-                    <button class="linked-for-detailpage" @click="redirectToDetailPage(product)" ></button>
-                      <div class="img-wrp vs-hr-imgwrap" >
-                        <img
-                          :src="
-                            productGetters.getProductThumbnailImage(product)
-                          "
-                          alt="cart"
-                        />
-                      </div>
-                      <div class="cat-card-links">
-                        <button
-                          @click="redirectToDetailPage(product)"
-                          class="btn d-flex view-btn align-items-center justify-content-center"
-                        >
-                          <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M8.5 16.2987C12.6421 16.2987 16 12.9408 16 8.79871C16 4.65657 12.6421 1.29871 8.5 1.29871C4.35786 1.29871 1 4.65657 1 8.79871C1 12.9408 4.35786 16.2987 8.5 16.2987Z"
-                              stroke="#ffffff"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
-                            <path
-                              d="M18.9998 19.2988L13.7998 14.0988"
-                              stroke="#ffffff"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
-                          </svg>
-                          <span class="btn-txt text-uppercase">view</span>
-                        </button>
-                        <button
-                          class="btn wishlist-btn d-flex align-items-center justify-content-center"
-                          v-if="isAuthenticated"
-                          @click="addItem({ product })"
-                        >
-                          <svg
-                            width="16"
-                            height="20"
-                            viewBox="0 0 16 20"
-                            :fill="isInWishlist({ product })? '#ffffff' : 'none'"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M15 19.2987L8 14.2987L1 19.2987V3.29871C1 2.19414 1.89543 1.29871 3 1.29871H13C14.1046 1.29871 15 2.19414 15 3.29871V19.2987Z"
-                              stroke="#ffffff"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
-                          </svg>
-
-                          <span class="btn-txt text-uppercase">wishlist</span>
-                        </button>
-                        <button
-                          class="btn wishlist-btn d-flex align-items-center justify-content-center"
-                          v-if="!isAuthenticated"
-                          @click="toggleLoginModal"
-                        >
-                          <svg
-                            width="16"
-                            height="20"
-                            viewBox="0 0 16 20"
-                            :fill="isInWishlist({ product })? '#ffffff' : 'none'"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M15 19.2987L8 14.2987L1 19.2987V3.29871C1 2.19414 1.89543 1.29871 3 1.29871H13C14.1046 1.29871 15 2.19414 15 3.29871V19.2987Z"
-                              stroke="#ffffff"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
-                          </svg>
-
-                          <span class="btn-txt text-uppercase">wishlist</span>
-                        </button>
-
-                      </div>                    
-                    </div>
-                    <div class="category-details">
-                      <div class="category-left">
-                        <div class="category-name">
-                          {{ productGetters.getName(product) }}
-                        </div>
-                        <div class="category-info">
-                          {{ product.author_3nd }}
-                        </div>
-                        <div class="price-wrap">
-                          <price :price="productGetters.getPrice(product)"></price>
-                        </div>
-                        <div class="rating">
-                          <rating :rating="productGetters.getAverageRating(product)"></rating>
-                          <!-- <img
-                            :src="productGetters.getAverageRating(product)"
-                            alt="rating"
-                            title="rating"
-                          /> -->
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </transition-group>
-
-                <transition-group
-                  v-else
-                  appear
-                  name="products__slide"
-                  tag="div"
-                  class="top-block active-grid ml-xl-4"
-                >
-                  <div
-                    v-for="(product, i) in products"
-                    :key="productGetters.getSlug(product)"
-                    class="category-wrap listcat-vw"
-                    :style="{ '--index': i }"
-                  >
-                  <button class="linked-for-detailpage" @click="redirectToDetailPage(product)" ></button>
-                    <div
-                      class="category-img mob-lt-hide var-hor-category-img"
-                      :class="$route.path.includes('kids') ? ('kidsbg' + (Math.floor(Math.random() * 8)+1)) : 'slider-img-bg'"
-                    >
-                    <button class="linked-for-detailpage" @click="redirectToDetailPage(product)" ></button>
-                      <div class="img-wrap vs-hr-imgwrap">
-                        <img
-                          :src="
-                            productGetters.getProductThumbnailImage(product)
-                          "
-                          alt="category"
-                          title="category"
-                        />
-                      </div>
-                      <div class="cat-card-links">
-                        <button
-                          @click="redirectToDetailPage(product)"
-                          class="btn d-flex view-btn align-items-center justify-content-center"
-                        >
-                          <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M8.5 16.2987C12.6421 16.2987 16 12.9408 16 8.79871C16 4.65657 12.6421 1.29871 8.5 1.29871C4.35786 1.29871 1 4.65657 1 8.79871C1 12.9408 4.35786 16.2987 8.5 16.2987Z"
-                              stroke="#ffffff"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            ></path>
-                            <path
-                              d="M18.9998 19.2988L13.7998 14.0988"
-                              stroke="#ffffff"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            ></path>
-                          </svg>
-                          <span class="btn-txt text-uppercase">view</span>
-                        </button>
-                        <button
-                          class="btn wishlist-btn d-flex align-items-center justify-content-center"
-                          v-if="isAuthenticated"
-                          @click="addItem({ product })"
-                        >
-                          <svg
-                            width="16"
-                            height="20"
-                            viewBox="0 0 16 20"
-                            :fill="isInWishlist({ product })? '#ffffff' : 'none'"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M15 19.2987L8 14.2987L1 19.2987V3.29871C1 2.19414 1.89543 1.29871 3 1.29871H13C14.1046 1.29871 15 2.19414 15 3.29871V19.2987Z"
-                              stroke="#ffffff"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
-                          </svg>
-
-                          <span class="btn-txt text-uppercase">wishlist</span>
-                        </button>
-                        <button
-                          class="btn wishlist-btn d-flex align-items-center justify-content-center"
-                          v-if="!isAuthenticated"
-                          @click="toggleLoginModal"
-                        >
-                          <svg
-                            width="16"
-                            height="20"
-                            viewBox="0 0 16 20"
-                            :fill="isInWishlist({ product })? '#ffffff' : 'none'"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M15 19.2987L8 14.2987L1 19.2987V3.29871C1 2.19414 1.89543 1.29871 3 1.29871H13C14.1046 1.29871 15 2.19414 15 3.29871V19.2987Z"
-                              stroke="#ffffff"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
-                          </svg>
-
-                          <span class="btn-txt text-uppercase">wishlist</span>
-                        </button>
-                      </div>
-                    </div>
-                    <div class="category-details">
-                      <div class="category-left">
-                        <div class="category-name">
-                          {{ productGetters.getName(product) }}
-                        </div>
-                        <div class="category-info">
-                          Shaykh Ahmad Ibn’Ajiba Al-Hasani
-                        </div>
-                        <div class="price-wrap">
-                          {{
-                            $n(
-                              productGetters.getPrice(product).regular,
-                              "currency"
-                            )
-                          }}
-                        </div>
-                        <div class="rating">
-                          <div class="ratings-wrap">
-                            <!-- {{productGetters.getAverageRating(product)}} -->
-                            <img
-                              :src="productGetters.getAverageRating(product)"
-                              alt="rating"
-                              title="rating"
-                            />
-                          </div>
-                        </div>
-                        <p class="product-list-sortdesc">
-                          {{ removeTags(productGetters.getShortDescription(product)) }}
-                        </p>
-                      </div>
-                      <div class="category-right">
-                        <div class="preview-wrap">
-                          <div
-                            id="watchVideo"
-                            class="watch-content text-center text-md-left"
-                          >
-                            <a href="#" @click="toggleAlchemia">
-                              <i class="icon-search"></i>
-                              <span class="text">See preview</span>
-                            </a>
-                          </div>
-                          <section
-                            :class="
-                              alchemiaVisible
-                                ? 'alchemia-show'
-                                : 'alchemia-hide'
-                            "
-                          >
-                            <div class="popup-overlay active d-none d-md-block">
-                              <div
-                                class="signin-popup shipping-popup watchvideo-popup"
-                              >
-                                <button
-                                  @click="toggleAlchemia"
-                                  href="#!"
-                                  class="close-icn"
-                                >
-                                  <img
-                                    src="/meccabook/close-icn.svg"
-                                    alt="logo"
-                                    title="logo"
-                                  />
-                                </button>
-                                <img
-                                  src="/meccabook/product-slide-img.png"
-                                  alt="image"
-                                />
-                              </div>
-                            </div>
-                          </section>
-                        </div>
-                        <div class="wishlist-wrap">
-                          <button
-                            v-if="!isAuthenticated"
-                            @click="toggleLoginModal"
-                          >
-                            <i class="icon-wishlist"></i>
-                            <span class="text">Add to wishlist</span>
-                          </button>
-                          <button
-                            v-if="isAuthenticated"
-                            @click="addItem({ product })"
-                          >
-                            <i class="icon-wishlist"></i>
-                            <span class="text">{{
-                              isInWishlist({ product })
-                                ? "Remove from wishlist"
-                                : "Add to wishlist"
-                            }}</span>
-                          </button>
-                        </div>
-                        <ShareButton />
-                      </div>
-                    </div>
-                  </div>
-                </transition-group>
-
-                <div class="page-info">
+                  {{ $t('Save for later') }}
+                </SfButton>
+              </template>
+            </AwProductCardHorizontal>
+          </transition-group>
+            <div class="page-info">
                   <p>
                     {{
                       `Showing ${rangeOfItemsShown} of ${pagination.totalItems} items`
                     }}
                   </p>
-
+              <LazyHydrate on-interaction>
                   <AwPagination
                     v-if="!loading"
                     v-show="pagination.totalPages > 1"
@@ -595,11 +263,11 @@
                     :total="pagination.totalPages"
                     :visible="5"
                   />
-                </div>
-              </div>  
+                </LazyHydrate>
+            </div>
           </div>
         </div>
-      </div>
+        </div>
     </section>
   </div>
 </AwLoader>
@@ -628,8 +296,6 @@ import {
   SfHeading,
   SfFilter,
   SfRadio,
-  SfProductCard,
-  SfProductCardHorizontal,
   SfAccordion,
   SfColor,
   SfProperty,
@@ -642,6 +308,7 @@ import {
   useRouter,
   useRoute,
   onMounted,
+  ssrRef
 } from "@nuxtjs/composition-api";
 import {
   categoryGetters,
@@ -662,14 +329,15 @@ import Badge from "~/components/Products/Badge";
 import Price from "~/components/Products/Price";
 import Rating from "~/components/Products/Rating";
 import { mapActions, mapGetters } from "vuex";
+import AwProductCard from '../pages/AwComponents/category/AwProductCard.vue'
+import AwProductCardHorizontal from '../pages/AwComponents/category/AwProductCardHorizontal.vue'
 export default defineComponent({
   components: {
     CategorySidebarMenu,
     SfSidebar,
     SfFilter,
     SfRadio,
-    SfProductCard,
-    SfProductCardHorizontal,
+    AwProductCardHorizontal,
     SfAccordion,
     AwLoader,
     SfColor,
@@ -692,7 +360,8 @@ export default defineComponent({
     Rating,
     SfButton,
     AwAccordion,
-    AwAccordionItem
+    AwAccordionItem,
+    AwProductCard
   },
   middleware: cacheControl({
     "max-age": 60,
@@ -700,33 +369,12 @@ export default defineComponent({
   }),
   transition: "fade",
 
-  data(){
-    return {
-      heading: (this.$route.path.substring(this.$route.path.lastIndexOf('/') + 1)),
-        latestProducts: null,
-    }
-  },
-
   computed: {
     ...mapGetters("drupalcms", [
-      "getHomeLatest",
       "getShortArray"
     ]),
-  },
-  methods: {
-    ...mapActions("drupalcms", [
-      "fetchHomeLatest",
-    ]),
-  },
-  mounted() {
 
-    this.fetchHomeLatest();
-    
-    // this.fetchHomeLatest().then(function(result){
-    //     that.latestProducts = result;
-    // });
   },
-
   setup() {
     const th = useUiHelpers();
     const uiState = useUiState();
@@ -737,8 +385,6 @@ export default defineComponent({
       $magento: { config: magentoConfig },
     } = useVSFContext();
     const { isAuthenticated } = useUser();
-
-    const { isInWishlist } = useWishlist();
 
     const { result, search, loading } = useFacet(`facetId:${path}`);
     const { changeFilters, isFacetColor } = useUiHelpers();
@@ -758,7 +404,14 @@ export default defineComponent({
         ])
       )
     );
-    console.log(result);
+
+    const {
+      addItem: addItemToWishlistBase,
+      isInWishlist,
+      removeItem: removeItemFromWishlist,
+    } = useWishlist("GlobalWishlist");
+    const { toggleLoginModal } = useUiState();
+
     const products = computed(() => facetGetters.getProducts(result.value));
 
     const categoryTree = computed(() =>
@@ -768,6 +421,7 @@ export default defineComponent({
         false
       )
     );
+
     const breadcrumbs = computed(() =>
       facetGetters.getBreadcrumbs(result.value)
     );
@@ -807,7 +461,7 @@ export default defineComponent({
           return hasUid ? value === categoryUid : false;
         }
       );
-
+       
       const categoryUidResult =
         categoryDeep?.parent && categoryDeep?.parent.length === 1
           ? categoryDeep?.parent[0]
@@ -855,9 +509,13 @@ export default defineComponent({
     };
 
     const addItemToWishlist = async (product) => {
-      await (isInWishlist({ product })
+      if(isAuthenticated.value){
+        await (isInWishlist({ product })
         ? removeItemFromWishlist({ product })
         : addItemToWishlistBase({ product }));
+        }else{
+        toggleLoginModal();
+      }
     };
 
     const searchCategoryProduct = async () => {
@@ -875,16 +533,27 @@ export default defineComponent({
       else str = str.toString();
       return str.replace(/(<([^>]+)>)/gi, "");
     };
+    const bgCoverImage =  ssrRef(null);
+    const heading = ssrRef(null);
 
+    const activeCategoryBanner = async () => { 
+      await resolveUrl();
+      const categoryId =  routeData.value?.entity_uid;
+      if(categoryId) {
+        const pindex = products.value[0].categories.findIndex(x => x.uid == categoryId);
+        bgCoverImage.value = products.value[0].categories[pindex].image;
+        heading.value = products.value[0].categories[pindex].name
+      } 
+    }
     onMounted(() => {
       if (route.value.params.slug_1 === "kids") {
         document.body.classList.add("kids-route");
       }
+      console.log(bgCoverImage.value)
     });
 
     onSSR(async () => {
       await resolveUrl();
-
       await categoriesSearch({
         pageSize: 20,
       });
@@ -909,15 +578,13 @@ export default defineComponent({
         }
 
         await searchCategoryProduct();
+        await activeCategoryBanner();
       }
     });
-
     const rangeOfItemsShown = computed(() => {
       const { currentPage, itemsPerPage } = pagination.value;
-
       const startRange = currentPage * itemsPerPage - itemsPerPage + 1;
       const endRange = currentPage * itemsPerPage;
-
       return `${startRange}-${endRange}`;
     });
 
@@ -932,8 +599,7 @@ export default defineComponent({
       alchemiaVisible.value = !alchemiaVisible.value;
     };
 
-    const { addItem } = useWishlist();
-    const { toggleLoginModal } = useUiState();
+
 
     return {
       routeData,
@@ -964,9 +630,10 @@ export default defineComponent({
       redirectToDetailPage,
       alchemiaVisible,
       toggleAlchemia,
-      addItem,
       toggleLoginModal,
-      removeTags
+      removeTags,
+      bgCoverImage,
+      heading,
     };
   },
 });
@@ -1413,6 +1080,8 @@ export default defineComponent({
 .capitalize {
     text-transform: capitalize;
 }
-
+.rating {
+  margin-bottom: 8px;
+}
 
 </style>

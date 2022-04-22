@@ -1,15 +1,17 @@
 <template>
+<div class="shipping-popup-block" v-if="isAuthenticated && hasSavedBillingAddress && !newAddressform">
   <ValidationObserver v-slot="{ handleSubmit, reset }" class="span-from">
+    <!-- <span class="billingtitle"> Billing </span> -->
     <form
       @submit.prevent="handleSubmit(handleAddressSubmit(reset))"
       class="copy-wrap"
     >
-      <SfCheckbox
-        v-e2e="'copy-address'"
-        :selected="sameAsShipping"
-        label="Copy address data from shipping"
-        name="copyShippingAddress"
-        class="form__element invisible-element"
+      <UserBillingAddresses
+        v-if="isAuthenticated && hasSavedBillingAddress && !newAddressform"
+        v-model="setAsDefault"
+        v-e2e="'billing-addresses'"
+        :current-address-id="currentAddressId || NOT_SELECTED_ADDRESS"
+        @setCurrentAddress="handleSetCurrentAddress"
       />
       <div
         v-if="canAddNewAddress"
@@ -208,6 +210,19 @@
           />
         </ValidationProvider>
       </div>
+      <div class="add-new">
+      <button
+        v-if="!newAddressform"
+        class="add-addr"
+        type="submit"
+        @click="handleAddNewAddressBtnClick"
+      >
+       <span> {{ $t('Add New Billing Address') }} </span>
+      </button>
+      </div>
+      <div>
+        <LoadingSpinner v-if="spinnerStatus" />
+      </div>
       <div class="form">
         <div class="form__action">
           <SfButton
@@ -217,16 +232,20 @@
           >
            <span> {{ $t('Continue') }} </span>
           </SfButton>
-          <nuxt-link
-            to="/checkout/shipping"
-            class="sf-button sf-button--underlined form__back-button smartphone-only"
-          >
-            Go back
-          </nuxt-link>
         </div>
+      </div>
+      <div class="btn-wrap text-center">
+        <button type="button" @click="preStep" class="back-link">Back</button>
       </div>
     </form>
   </ValidationObserver>
+</div>
+<div v-else>
+  <Shipping v-if="newAddressform" />
+    <div v-else>
+    <LoadingSpinner/>
+  </div>
+</div>
 </template>
 
 <script>
@@ -257,8 +276,10 @@ import {
   useRouter,
   defineComponent,
 } from '@nuxtjs/composition-api';
+import LoadingSpinner from '../../components/LoadingSpinner.vue';
 import { addressFromApiToForm, formatAddressReturnToData } from '~/helpers/checkout/address';
 import { useUiState, useUiNotification } from "~/composables";
+import Shipping from "./Shipping.vue";
 const NOT_SELECTED_ADDRESS = '';
 extend('required', {
   ...required,
@@ -282,6 +303,8 @@ export default defineComponent({
     SfCheckbox,
     ValidationProvider,
     ValidationObserver,
+    LoadingSpinner,
+    Shipping,
     UserBillingAddresses: () => import('~/components/Checkout/UserBillingAddresses.vue'),
   },
   setup() {
@@ -310,13 +333,14 @@ export default defineComponent({
     const { isAuthenticated } = useUser();
     let oldBilling = null;
     const sameAsShipping = ref(false);
+    const spinnerStatus = ref(false);
     const billingDetails = ref(addressFromApiToForm(address.value) || {});
     const currentAddressId = ref(NOT_SELECTED_ADDRESS);
     const setAsDefault = ref(false);
     const isFormSubmitted = ref(false);
     const canAddNewAddress = ref(true);
     const isBillingDetailsStepCompleted = ref(false);
-    const { checkoutstep, nextStep,preStep, newAddressform, toggleAddressForm } = useUiState();
+    const { checkoutstep, nextStep,preStep, newAddressform, toggleAddressForm, openAddressform } = useUiState();
     const canMoveForward = computed(() => !loading.value && billingDetails.value && Object.keys(
       billingDetails.value,
     ).length > 0);
@@ -330,14 +354,16 @@ export default defineComponent({
     const countriesList = computed(() => addressGetter.countriesList(countries.value));
     const regionInformation = computed(() => addressGetter.regionList(country.value));
     const handleAddressSubmit = (reset) => async () => {
+      spinnerStatus.value = true;
+      console.log(spinnerStatus.value,'spinnerStatus');
       const addressId = currentAddressId.value;
-      await save({
-        billingDetails: {
-          ...billingDetails.value,
-          customerAddressId: addressId,
-          sameAsShipping: sameAsShipping.value,
-        },
-      });
+      // await save({
+      //   billingDetails: {
+      //     ...billingDetails.value,
+      //     customerAddressId: addressId,
+      //     sameAsShipping: sameAsShipping.value,
+      //   },
+      // });
       if (addressId !== NOT_SELECTED_ADDRESS && setAsDefault.value) {
         const chosenAddress = userBillingGetters.getAddresses(
           userBilling.value,
@@ -348,8 +374,12 @@ export default defineComponent({
         }
       }
       reset();
-      nextStep();
+      spinnerStatus.value = false;
+      console.log(spinnerStatus.value,'after-spinnerStatus');
       isBillingDetailsStepCompleted.value = true;
+      if(isBillingDetailsStepCompleted.value === true && addressId) {
+        await nextStep();
+      }
     };
     const handleCheckSameAddress = async () => {
       sameAsShipping.value = !sameAsShipping.value;
@@ -374,9 +404,7 @@ export default defineComponent({
       }
     };
     const handleAddNewAddressBtnClick = () => {
-      currentAddressId.value = NOT_SELECTED_ADDRESS;
-      billingDetails.value = {};
-      canAddNewAddress.value = true;
+      openAddressform();
       isBillingDetailsStepCompleted.value = false;
     };
     const handleSetCurrentAddress = (addr) => {
@@ -418,6 +446,7 @@ export default defineComponent({
 
     });
     onMounted(async () => {
+      await loadUserBilling();
       if (billingDetails.value?.country_code) {
         await searchCountry({ id: billingDetails.value.country_code });
       }
@@ -459,7 +488,11 @@ export default defineComponent({
       setAsDefault,
       billingDetails,
       sameAsShipping,
-      nextStep
+      nextStep,
+      preStep,
+      spinnerStatus,
+      newAddressform,
+      openAddressform
     };
   },
 });
@@ -572,5 +605,18 @@ export default defineComponent({
    button {
      z-index: 10;
    }
+}
+
+.billingtitle {
+  color: #2C354E;
+  font-size: 1.7rem;
+  line-height: 1.2;
+  font-family: "leksa", serif;
+  letter-spacing: -0.035em;
+  right: auto;
+  bottom: auto;
+  align-items: center;
+  margin-bottom: 20px;
+  margin-left: 40px;
 }
 </style>

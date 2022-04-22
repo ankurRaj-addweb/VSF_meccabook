@@ -1,58 +1,52 @@
 <template>
-     <div class="related-slider d-flex">
-    
-    
-          <div class="row" >
-            <template v-for="(item,idx) in latest">
-             
-            
-            <div class="col-md-3 col-sm-6 col-xs-6" v-if="idx <=7"  :key="idx">
-              <div class="related-wrap" >
-                <div
-                  :class="$route.path === '/kids-home'
-                ? ('kidsbg' + (Math.floor(Math.random() * 8)+1))
-                : 'slider-img-bg'"
-                  @click="redirectToDetailPage(latest[0])"
-                >
-                  <div class="img-wrap vs-hr-imgwrap">
-                    <img
-                      :src="item.product_image"
-                      alt="category"
-                      title="category"
-                    />
-                  </div>
-                </div>
-                <div class="related-details text-center" 
-                 @click="redirectToDetailPage(item)"
-                 >
-                  <div class="category-name">
-                    <!-- {{ getkidslatest[0].data[0].product_name }} -->
-                     {{ item.product_name }}
-                    
-                  </div>
-                  <div class="category-info">
-                    {{item.author_name}}
-                  </div>
-                  <div class="price-wrap">${{item.price}}</div>
-                  <div class="rating">
-                    <div class="ratings-wrap">
-                      <img
-                        src="/meccabook/ratings.png"
-                        alt="rating"
-                        title="rating"
-                      />
-                    </div>
-                  </div>
-                </div>
+  <div class="related-slider d-flex">
+    <div class="row" >
+      <template v-for="(item,idx) in latest">
+      <div class="col-md-3 col-sm-6 col-xs-6" v-if="idx <=7"  :key="idx">
+        <div class="related-wrap" >
+          <div
+            class="related-img category-img var-hor-category-img"
+            :class="$route.path === '/kids-home'
+          ? ('kidsbg' + (Math.floor(Math.random() * 8)+1))
+          : 'slider-img-bg'"
+            @click="redirectToDetailPage(item)"
+          >
+            <div class="img-wrap vs-hr-imgwrap">
+              <img
+                :src="item.product_image"
+                alt="category"
+                title="category"
+              />
+            </div>
+          </div>
+          <div class="related-details text-center" 
+            @click="redirectToDetailPage(item)"
+            >
+            <div class="category-name">
+                {{ item.product_name }}
+            </div>
+            <div class="category-info">
+              {{item.author_name}}
+            </div>
+            <div class="price-wrap">${{item.price}}</div>
+            <div class="rating">
+              <div class="ratings-wrap">
+                <rating
+                  :rating="item.review"
+                ></rating>
               </div>
             </div>
-            </template>
           </div>
         </div>
+      </div>
+      </template>
+    </div>
+  </div>
 </template>
 <script>
 import { useUiState } from "~/composables";
 import { useRouter } from "@nuxtjs/composition-api";
+import Rating from "~/components/Products/Rating";
 
 export default {
     props:{
@@ -60,6 +54,9 @@ export default {
         type: Array,
         default: null
       }
+    },
+    components: {
+      Rating,
     },
     setup() {
       const { getSlugLink } = useUiState();
@@ -111,7 +108,6 @@ export default {
 }
 .var-hor-category-img {
     height: 300px;
-    // height: 100%;
     max-width: 100%;
    @media all and (max-width: 767px) {
      height: 136px;
@@ -129,5 +125,4 @@ export default {
         object-fit: contain;
     }
 }
-
 </style>

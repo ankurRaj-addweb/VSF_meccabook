@@ -1,43 +1,36 @@
 <template>
   <ValidationObserver v-slot="{ handleSubmit, reset }">
-    <form
-      class="form"
-      @submit.prevent="handleSubmit(submitForm(reset))"
-    >
+    <form class="form" @submit.prevent="handleSubmit(submitForm(reset))">
       <div class="form__horizontal">
         <ValidationProvider
           v-slot="{ errors }"
-          rules="required|min:2"
+          rules="required|alpha|min:2"
           class="form__element"
         >
-        <div class="sign-input-wrap">
-          <label>First Name</label>
-          <input
-            v-model="form.firstname"
-            name="firstName"
-            required
-            :valid="!errors[0]"
-            class="form-control"
-            :error-message="errors[0]"
-          />
-        </div>
+          <div class="sign-input-wrap">
+            <AwInput
+              v-model="form.firstname"
+              name="firstname"
+              label="First Name"
+              :valid="!errors[0]"
+              :error-message="errors[0]"
+            />
+          </div>
         </ValidationProvider>
         <ValidationProvider
           v-slot="{ errors }"
-          rules="required|min:2"
+          rules="required|alpha|min:2"
           class="form__element"
         >
-        <div class="sign-input-wrap">
-          <label>Last Name</label>
-          <input
-            v-model="form.lastname"
-            name="lastName"
-            required
-            :valid="!errors[0]"
-            class="form-control"
-            :error-message="errors[0]"
-          />
-        </div>
+          <div class="sign-input-wrap">
+             <AwInput
+              v-model="form.lastname"
+              name="lastName"
+              label="Last Name"
+              :valid="!errors[0]"
+              :error-message="errors[0]"
+            />
+          </div>
         </ValidationProvider>
       </div>
       <ValidationProvider
@@ -45,18 +38,15 @@
         rules="required|email"
         class="form__element"
       >
-      <div class="sign-input-wrap in-wrap">
-        <label>Email</label>
-        <input
-          v-model="form.email"
-          type="email"
-          name="email"
-          required
-          :valid="!errors[0]"
-          class="form-control"
-          :error-message="errors[0]"
-        />
-      </div>
+        <div class="sign-input-wrap in-wrap">
+            <AwInput
+              v-model="form.email"
+              name="email"
+              label="Email"
+              :valid="!errors[0]"
+              :error-message="errors[0]"
+            />
+        </div>
       </ValidationProvider>
       <SfModal
         :visible="requirePassword"
@@ -65,47 +55,47 @@
         persistent
         @close="requirePassword = false"
       >
-       <h4 class="desc">{{ $t('Please type your current password to change your email address.') }}</h4> 
-       <div class="sign-input-wrap wrap">
-         <label>CurrentPassword</label>
-        <input
-          v-model="currentPassword"
-          type="password"
-          name="currentPassword"
-          label="Current Password"
-          required
-          class="form-control"
-          @keypress.enter="handleSubmit(submitForm(reset))"
-        />
+        <h4 class="desc">
+          {{
+            $t(
+              "Please type your current password to change your email address."
+            )
+          }}
+        </h4>
+        <div class="sign-input-wrap wrap">
+          <label>CurrentPassword</label>
+          <input
+            v-model="currentPassword"
+            type="password"
+            name="currentPassword"
+            label="Current Password"
+            class="form-control"
+            @keypress.enter="handleSubmit(submitForm(reset))"
+          />
         </div>
-        <button
-          class="btn CartBtn"
-          @click="handleSubmit(submitForm(reset))"
-        >
-          <span>{{ $t('Update personal data') }}</span>
+        <button class="btn CartBtn" @click="handleSubmit(submitForm(reset))">
+          <span>{{ $t("Update personal data") }}</span>
         </button>
       </SfModal>
       <button class="btn CartBtn">
-        <span>{{ $t('Update personal data') }}</span>
+        <span>{{ $t("Update personal data") }}</span>
       </button>
     </form>
   </ValidationObserver>
 </template>
 
 <script>
-import { defineComponent, ref } from '@nuxtjs/composition-api';
-import { ValidationProvider, ValidationObserver } from 'vee-validate';
-import { useUser, userGetters } from '@vue-storefront/magento';
-import {
-  SfInput,
-  SfButton,
-  SfModal,
-} from '@storefront-ui/vue';
-import { useUiNotification } from '~/composables';
+import { defineComponent, ref } from "@nuxtjs/composition-api";
+import { ValidationProvider, ValidationObserver } from "vee-validate";
+import { useUser, userGetters } from "@vue-storefront/magento";
+import { SfInput, SfButton, SfModal } from "@storefront-ui/vue";
+import { useUiNotification } from "~/composables";
+import AwInput from "../../pages/AwComponents/atoms/AwInput.vue";
 
 export default defineComponent({
-  name: 'ProfileUpdateForm',
+  name: "ProfileUpdateForm",
   components: {
+    AwInput,
     SfInput,
     SfButton,
     SfModal,
@@ -119,19 +109,17 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: ['submit'],
+  emits: ["submit"],
   setup(props, { emit }) {
     const { user } = useUser();
-    const currentPassword = ref('');
+    const currentPassword = ref("");
     const requirePassword = ref(false);
     const resetForm = () => ({
       firstname: userGetters.getFirstName(user.value),
       lastname: userGetters.getLastName(user.value),
       email: userGetters.getEmailAddress(user.value),
     });
-    const {
-      send: sendNotification,
-    } = useUiNotification();
+    const { send: sendNotification } = useUiNotification();
 
     const form = ref(resetForm());
 
@@ -139,14 +127,14 @@ export default defineComponent({
       const onComplete = () => {
         form.value = resetForm();
         requirePassword.value = false;
-        currentPassword.value = '';
+        currentPassword.value = "";
         sendNotification({
-          id: Symbol('user_updated'),
-          message: 'The user account data was successfully updated!',
-          type: 'success',
-          icon: 'check',
+          id: Symbol("user_updated"),
+          message: "The user account data was successfully updated!",
+          type: "success",
+          icon: "check",
           persist: false,
-          title: 'User Account',
+          title: "User Account",
         });
         resetValidationFn();
       };
@@ -154,14 +142,16 @@ export default defineComponent({
       const onError = () => {
         form.value = resetForm();
         requirePassword.value = false;
-        currentPassword.value = '';
+        currentPassword.value = "";
       };
 
       if (
-        (userGetters.getEmailAddress(user.value) !== form.value.email
-        && !requirePassword.value) || (userGetters.getFirstName(user.value) !== form.value.firstname
-        && !requirePassword.value) || (userGetters.getLastName(user.value) !== form.value.lastname
-        && !requirePassword.value)
+        (userGetters.getEmailAddress(user.value) !== form.value.email &&
+          !requirePassword.value) ||
+        (userGetters.getFirstName(user.value) !== form.value.firstname &&
+          !requirePassword.value) ||
+        (userGetters.getLastName(user.value) !== form.value.lastname &&
+          !requirePassword.value)
       ) {
         requirePassword.value = true;
       } else {
@@ -169,7 +159,7 @@ export default defineComponent({
           form.value.password = currentPassword.value;
         }
 
-        emit('submit', { form, onComplete, onError });
+        emit("submit", { form, onComplete, onError });
       }
     };
 

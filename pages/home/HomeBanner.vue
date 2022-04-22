@@ -23,40 +23,39 @@
           }}</span>
           <h1 class="banner-title">{{ slider[imageIndex].title }}</h1>
           <p class="desc" v-html="slider[imageIndex].description.text"></p>
-          <!-- <p>{{ slider }}</p> -->
-          <router-link :to="slider[imageIndex].cta.url" class="btn banner-btn btn-shadow" v-if="slider[imageIndex].cta && slider[imageIndex].cta.url">
-            <span v-if="slider[imageIndex].cta.label">{{ slider[imageIndex].cta.label }}</span>
+          <router-link
+            :to="slider[imageIndex].cta.url"
+            class="btn banner-btn btn-shadow"
+            v-if="slider[imageIndex].cta && slider[imageIndex].cta.url"
+          >
+            <span v-if="slider[imageIndex].cta.label">{{
+              slider[imageIndex].cta.label
+            }}</span>
           </router-link>
         </div>
       </div>
     </div>
-
     <i
       class="control prev"
-      @click="prev()"
+      @click="
+        slider[imageIndex - 1]
+          ? prev('bannercarousel')
+          : prevEnd('bannercarousel')
+      "
     ></i>
     <i
       class="control next"
-      @click="next()"
+      @click="
+        slider[imageIndex + 1]
+          ? next('bannercarousel')
+          : nextEnd('bannercarousel')
+      "
     ></i>
   </section>
 </template>
 
-
 <script type="module">
-import { useProduct, productGetters } from "@vue-storefront/magento";
-import {
-  computed,
-  defineComponent,
-  ref,
-  onMounted,
-} from "@nuxtjs/composition-api";
-import { onSSR } from "@vue-storefront/core";
-import LazyHydrate from "vue-lazy-hydration";
-import MobileStoreBanner from "~/components/MobileStoreBanner.vue";
-import InstagramFeed from "~/components/InstagramFeed.vue";
-import { mapActions, mapGetters } from "vuex";
-import { paginate } from "../../mixins/paginatedContent.js";
+import { defineComponent, ref, onMounted } from "@nuxtjs/composition-api";
 import Carousel from "vue-slick-carousel";
 
 export default defineComponent({
@@ -69,7 +68,6 @@ export default defineComponent({
   },
   data() {
     return {
-      contentFieldName: "getLatestArticle",
       carouselConfig: {
         infinite: true,
         centerMode: false,
@@ -79,103 +77,34 @@ export default defineComponent({
         arrows: false,
         speed: 300,
       },
-      selectedTab: "featured",
-      selectedTab: "popular",
     };
   },
   components: {
-    InstagramFeed,
-    LazyHydrate,
-    MobileStoreBanner,
     Carousel,
   },
-  mixins: [paginate],
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  setup(context) {
-    const {
-      products: newProductsResult,
-      search: newProductsSearch,
-      loading: newProductsLoading,
-    } = useProduct("newProducts");
+  setup(props, context) {
 
     const bannercarousel = ref(null);
     let imageIndex = ref(0);
 
-    const banners = ref([
-      {
-        slot: "banner-A",
-        subtitle: "Dresses",
-        title: "Cocktail & Party",
-        description:
-          "Find stunning women's cocktail dresses and party dresses. Stand out in lace and metallic cocktail dresses from all your favorite brands.",
-        buttonText: "Shop now",
-        image: {
-          mobile:
-            "https://cdn.shopify.com/s/files/1/0407/1902/4288/files/bannerB_328x343.jpg",
-          desktop:
-            "https://cdn.shopify.com/s/files/1/0407/1902/4288/files/bannerF_332x840.jpg",
-        },
-        class: "sf-banner--slim desktop-only",
-        link: "/c/women/women-clothing-skirts",
-      },
-      {
-        slot: "banner-B",
-        subtitle: "Dresses",
-        title: "Linen Dresses",
-        description:
-          "Find stunning women's cocktail dresses and party dresses. Stand out in lace and metallic cocktail dresses from all your favorite brands.",
-        buttonText: "Shop now",
-        image: {
-          mobile:
-            "https://cdn.shopify.com/s/files/1/0407/1902/4288/files/bannerE_328x343.jpg",
-          desktop:
-            "https://cdn.shopify.com/s/files/1/0407/1902/4288/files/bannerE_496x840.jpg",
-        },
-        class: "sf-banner--slim banner-central desktop-only",
-        link: "/c/women/women-clothing-dresses",
-      },
-      {
-        slot: "banner-C",
-        subtitle: "T-Shirts",
-        title: "The Office Life",
-        image: {
-          mobile:
-            "https://cdn.shopify.com/s/files/1/0407/1902/4288/files/bannerC_328x343.jpg",
-          desktop:
-            "https://cdn.shopify.com/s/files/1/0407/1902/4288/files/bannerC_332x400.jpg",
-        },
-        class: "sf-banner--slim banner__tshirt",
-        link: "/c/women/women-clothing-shirts",
-      },
-      {
-        slot: "banner-D",
-        subtitle: "Summer Sandals",
-        title: "Eco Sandals",
-        image: {
-          mobile:
-            "https://cdn.shopify.com/s/files/1/0407/1902/4288/files/bannerG_328x343.jpg",
-          desktop:
-            "https://cdn.shopify.com/s/files/1/0407/1902/4288/files/bannerG_332x400.jpg",
-        },
-        class: "sf-banner--slim",
-        link: "/c/women/women-shoes-sandals",
-      },
-    ]);
-
-    // @ts-ignore
-    const newProducts = computed(() =>
-      productGetters.getFiltered(newProductsResult.value?.items, {
-        master: true,
-      })
-    );
-
     const next = () => {
-      // imageIndex.value += 1;
+      imageIndex.value += 1;
       bannercarousel.value.next();
     };
 
     const prev = () => {
-      // imageIndex.value -= 1;
+      imageIndex.value -= 1;
+      bannercarousel.value.prev();
+    };
+
+    const nextEnd = () => {
+      imageIndex.value = 0;
+      bannercarousel.value.next();
+    };
+
+    const prevEnd = () => {
+      imageIndex.value = props.slider.length - 1;
       bannercarousel.value.prev();
     };
 
@@ -187,71 +116,14 @@ export default defineComponent({
       }
     });
 
-    onSSR(async () => {
-      await newProductsSearch({
-        pageSize: 10,
-        currentPage: 1,
-        sort: {
-          position: "ASC",
-        },
-      });
-    });
-
-    const carouselConfig = ref({
-      infinite: true,
-      centerMode: false,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      variableWidth: true,
-      arrows: false,
-      speed: 300,
-    });
-
     return {
-      banners,
-      newProducts,
-      newProductsLoading,
-      productGetters,
-      carouselConfig,
       next,
       prev,
       bannercarousel,
       imageIndex,
+      nextEnd,
+      prevEnd
     };
-  },
-  computed: {
-    ...mapGetters("drupalcms", [
-      "getArticlesContent",
-      "getLatestArticle",
-      "getAboutusContent",
-    ]),
-  },
-  methods: {
-    ...mapActions("drupalcms", ["fetchAboutus", "fetchArticles"]),
-    prevKn() {
-      this.$refs.kgcarousel.prev();
-    },
-    nextKn() {
-      this.$refs.kgcarousel.next();
-    },
-    select(event, tabName) {
-      let navLinks = document.getElementsByClassName("nav-link");
-
-      for (let i = 0; i < navLinks.length; i++) {
-        navLinks[i].classList.remove("active");
-      }
-
-      let selectedElement = event.target;
-      selectedElement.classList.add("active");
-
-      this.selectedTab = tabName;
-    },
-  },
-  mounted() {
-    this.fetchAboutus();
-  },
-  beforeMount() {
-    this.fetchArticles();
   },
 });
 </script>
@@ -280,7 +152,6 @@ export default defineComponent({
 
 #home {
   box-sizing: border-box;
-  // padding: 0 var(--spacer-sm);
   @include for-desktop {
     padding: 0;
     margin: 0 auto;
@@ -482,5 +353,21 @@ export default defineComponent({
 }
 .slick-track[data-v-e4caeaf8] {
   display: flex !important;
+}
+i.control.prev {
+  @media only screen and (min-width: 768px) {
+    margin-left: 50px;
+  }
+  @media only screen and (max-width: 767px) {
+    margin-left: 20px;
+  }
+}
+i.control.next {
+  @media only screen and (min-width: 768px) {
+    margin-right: 50px;
+  }
+  @media only screen and (max-width: 767px) {
+    margin-right: 20px;
+  }
 }
 </style>

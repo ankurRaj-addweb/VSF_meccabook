@@ -12,9 +12,9 @@
             justify-content-start justify-content-xl-center
           "  v-if="browseBySubject"
         >
-          <li v-for="item in browseBySubject" :key="item.category_id">
-            <span class="icon-img" v-if="item.category_image && item.category_url">
-              <nuxt-link :to="item.category_url.replace('http://meccamagento.addwebprojects.com','/c')"><img :src="item.category_image" alt="icon" /></nuxt-link>
+          <li v-for="(item, idx) in browseBySubject" :key="item.category_id">
+            <span class="icon-img">
+              <nuxt-link :to="item.category_url.replace($config.magentoURL,'/c/')"><img :src=" '/meccabook/' + ImgUrl[idx] " alt="icon" /></nuxt-link>
             </span>
             <p class="desc" v-if="item.category_name">{{ item.category_name }}</p>
           </li>
@@ -25,7 +25,6 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
 export default {
   props:{
     browseBySubject:{
@@ -33,5 +32,10 @@ export default {
       default: null,
     },
   },
+  data() {
+    return {
+      ImgUrl: ['technology.svg','politics.svg','worship.svg','prophet.svg','spirituality.svg','science.svg','society.svg']
+    }
+  }
 };
 </script>

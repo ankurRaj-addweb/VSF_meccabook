@@ -1,5 +1,4 @@
-import axios from "axios";
-import { isNull } from "lodash";
+import DrupalAxios from "axios";
 export default {
   state() {
     return {
@@ -15,7 +14,6 @@ export default {
       relatedProduct: null,
       landingPage:null,
       productConfigurable: null,
-      relatedProduct: null,
       kids:null,
       kidslatest:null,
       kidsfeatured:null,
@@ -29,7 +27,7 @@ export default {
       articleDetails: null,
       eventDetails: null,
       dynamicPageContent: null,
-      ShortArray:['10','12','36','72','144'],
+      ShortArray:['12','36','72','144'],
       top50: null,
       SignedBooks:null,
       eventsHide: null,
@@ -161,7 +159,7 @@ export default {
   actions: {
     fetchEventsHide({ commit, dispatch, state }, eventPath) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.drupalURL}/api/event/upcoming`)
           .then(response => {
             var eventData = response.data.upcoming_events;
@@ -175,7 +173,7 @@ export default {
     },
     fetchAboutus({ commit, dispatch, state }) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.drupalURL}/api/content/6`)
           .then(response => {
             commit('SET_ABOUT_US', response.data)
@@ -187,7 +185,7 @@ export default {
     },
     fetchDonations({ commit, dispatch, state }) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.drupalURL}/api/content/7`)
           .then(response => {
             commit('SET_DONATIONS', response.data)
@@ -199,7 +197,7 @@ export default {
     },
     fetchEvents({ commit, dispatch, state }) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.drupalURL}/api/content/8`)
           .then(response => {
             commit('SET_EVENTS', response.data)
@@ -211,7 +209,7 @@ export default {
     },
     fetchUpcomingEvents({ commit, dispatch, state }) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.drupalURL}/api/event/upcoming`)
           .then(response => {
             commit('SET_UPCOMING_EVENTS', response.data.upcoming_events)
@@ -223,7 +221,7 @@ export default {
     },
     fetchProductDetail({ commit, dispatch, state }, productSku) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.magentoURL}/rest/V1/productattribute?sku=${productSku}`)
           .then(response => {
             commit('SET_PRODUCT_DETAIL', response.data[0].data);
@@ -235,7 +233,7 @@ export default {
     },
     fetchProductConfigurable({commit, dispatch, state}, productSku) {
       {
-        axios
+        DrupalAxios
         .get(`${this.$config.magentoURL}/rest/V1/configoptions?sku=${productSku}`)
           .then(response => {
               commit('SET_PRODUCT_CONFIGURABLE', response.data[0]);
@@ -247,7 +245,7 @@ export default {
     },
     fetchRelatedProduct({commit, dispatch, state}, productSku) {
       {
-        axios
+        DrupalAxios
         .get(`${this.$config.magentoURL}/rest/V1/relatedproduct?sku=${productSku}`)
           .then(response => {
               commit('SET_RELATED_PRODUCT', response.data[0]);
@@ -260,7 +258,7 @@ export default {
     },
     fetchKids({commit, dispatch, state}) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.drupalURL}/api/content/63`)
           .then(response => {
               commit('SET_KIDS', response.data)
@@ -272,7 +270,7 @@ export default {
     },
     fetchKidslatest({commit, dispatch, state}) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.magentoURL}/rest/V1/latestproduct?category_id=88`)
           .then(response => {
             console.log(response.data)
@@ -286,7 +284,7 @@ export default {
     },
     fetchKidsfeatured({commit, dispatch, state}) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.magentoURL}/rest/V1/featuredproduct?category_id=88`)
           .then(response => {
             console.log(response.data)
@@ -300,8 +298,8 @@ export default {
     },
     fetchKidspopular({commit, dispatch, state}) {
       {
-        axios
-          .get(`${this.$config.magentoURL}/rest/V1/latestproduct`)
+        DrupalAxios
+          .get(`/kidsPopular`)
           .then(response => {
             console.log(response.data)
               commit('SET_KIDS_POPULAR', response.data)
@@ -314,7 +312,7 @@ export default {
     },
     fetchArticles({commit, dispatch, state}) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.drupalURL}/api/article/list`)
           .then(response => {
             commit('SET_ARTICLES', response.data);
@@ -327,7 +325,7 @@ export default {
     },
     fetchHome({ commit, dispatch, state }) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.drupalURL}/api/content/56`)
           .then(response => {
             commit('SET_HOME', response.data)
@@ -339,7 +337,7 @@ export default {
     },
     fetchlandingpage({commit, dispatch, state}) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.drupalURL}/api/content/36`)
           .then(response => {
               commit('SET_LANDING_PAGE', response.data);
@@ -351,7 +349,7 @@ export default {
       },
     fetchContactUs({commit, dispatch, state}) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.drupalURL}/api/content/64`)
           .then(response => {
               commit('SET_CONTACT_US', response.data);
@@ -363,7 +361,7 @@ export default {
     },
     fetchMenu({ commit, dispatch, state }) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.drupalURL}/api/menu`)
           .then(response => {
             commit('SET_MENU', response.data)
@@ -375,7 +373,7 @@ export default {
     },
     fetchBrowseBySubject({ commit, dispatch, state }) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.magentoURL}/rest/V1/subjects`)
           .then(response => {
             commit('SET_BROWSE_BY_SUBJECT', response.data)
@@ -387,8 +385,8 @@ export default {
     },
     fetchHomePopular({ commit, dispatch, state }) {
       {
-        axios
-          .get(`${this.$config.magentoURL}/rest/V1/latestproduct`)
+        DrupalAxios
+          .get(`/adultPopular`)
           .then(response => {
             commit('SET_HOME_POPULAR', response.data)
           })
@@ -399,7 +397,7 @@ export default {
     },
     fetchHomeLatest({ commit, dispatch, state }) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.magentoURL}/rest/V1/latestproduct`)
           .then(response => {
             commit('SET_HOME_LATEST', response.data)
@@ -411,7 +409,7 @@ export default {
     },
     fetchHomeFeatured({ commit, dispatch, state }) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.magentoURL}/rest/V1/featuredproduct`)
           .then(response => {
             commit('SET_HOME_FEATURED', response.data)
@@ -423,7 +421,7 @@ export default {
     },
     fetchDonationsMagento({ commit, dispatch, state }) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.magentoURL}/rest/V1/donations`)
           .then(response => {
             commit('SET_DONATIONS_MAGENTO', response.data)
@@ -435,7 +433,7 @@ export default {
     },
     fetchArticleDetails({ commit, dispatch, state }, articleNode) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.drupalURL}/api/content/`+articleNode)
           .then(response => {
             commit('SET_ARTICLE_DETAILS', response.data)
@@ -447,7 +445,7 @@ export default {
     },
     fetchEventDetails({ commit, dispatch, state }, eventNode) {
       {
-        axios
+        DrupalAxios
           .get(`${this.$config.drupalURL}/api/content/`+eventNode)
           .then(response => {
             commit('SET_EVENT_DETAILS', response.data)
@@ -460,7 +458,7 @@ export default {
     fetchDynamicPageContent({ commit, dispatch, state }, pageNode) {
       {
         console.log(pageNode);
-        axios
+        DrupalAxios
           .get('https://devmeccabooks.addwebprojects.com/api/content/'+pageNode)
           .then(response => {
             commit('SET_DYNAMIC_PAGE_CONTENT', response.data)
@@ -473,7 +471,7 @@ export default {
     },
     fetchtop50({commit, dispatch, state}){
       {
-      axios
+      DrupalAxios
           .get('http://meccamagento.addwebprojects.com/rest/V1/top-50')
           .then(response => {
             commit('SET_TOP50', response.data)
@@ -486,7 +484,7 @@ export default {
   },
   fetchSignedBooks({commit, dispatch, state}){
     {
-    axios
+    DrupalAxios
         .get('http://meccamagento.addwebprojects.com/rest/V1/signed-book')
         .then(response => {
           commit('SET_SIGNED_BOOKS', response.data)

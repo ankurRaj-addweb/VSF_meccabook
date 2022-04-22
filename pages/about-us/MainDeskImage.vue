@@ -14,3 +14,12 @@ export default {
   }
 }
 </script>
+
+<style lang="scss"  scoped>
+.viewImg {
+    img {
+    max-height: 898px;
+    max-width: 611px;
+  }
+}
+</style>

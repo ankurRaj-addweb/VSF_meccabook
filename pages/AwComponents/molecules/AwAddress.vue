@@ -12,13 +12,14 @@
       </slot>
     </template>
   </AwRadio>
-  <span @click="catchAddId(addId)"><img src="/meccabook/close-rounded.svg" alt="close"/></span>
+  <span v-if="checkoutstep === 1" @click="catchAddId(addId)"><img src="/meccabook/close-rounded.svg" alt="close"/></span>
   
 </div>
   
 </template>
 <script>
 import AwRadio from "./AwRadio.vue";
+import { useUiState, useUiNotification } from "~/composables";
 
 export default {
   name: "SfAddressPicker",
@@ -56,6 +57,12 @@ export default {
       },
     },
   },
+  setup() {
+    const {  checkoutstep } = useUiState();
+    return {
+      checkoutstep
+    }
+  }
 };
 </script>
 

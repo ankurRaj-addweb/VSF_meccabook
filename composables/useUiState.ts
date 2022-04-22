@@ -56,6 +56,10 @@ const useUiState = () => {
     state.newAddressform = false
   }
 
+  const openAddressform = () => {
+    state.newAddressform = true
+  }
+
   const toggleAddressForm = () => {
     state.newAddressform = !state.newAddressform
   }
@@ -176,6 +180,7 @@ const useUiState = () => {
     newAddressform,
     toggleAddressForm,
     closeAddressform,
+    openAddressform,
     resetStep
   };
 };

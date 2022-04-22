@@ -78,3 +78,10 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+span.sf-chevron__bar.sf-chevron__bar--left, 
+span.sf-chevron__bar.sf-chevron__bar--right {
+  display: none;
+}
+</style>

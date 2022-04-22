@@ -12,10 +12,6 @@ export default {
     to: {
       required: false,
     }
-    // myclass: {
-    //   type: String,
-    //   required: false
-    // }
   }
 };
 </script>
@@ -36,7 +32,6 @@ export default {
   padding: 2 px 19 px 1 px;
   -webkit-appearance: none;
   transition: all 0.3s ease-in-out;
-  /* position: relative; */
   text-align: center;
   vertical-align: middle;
   user-select: none;

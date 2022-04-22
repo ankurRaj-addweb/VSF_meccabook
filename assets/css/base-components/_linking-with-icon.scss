@@ -41,7 +41,7 @@ span.icon-img {
     display: inline-block;
     margin-bottom: 10px;
     cursor: pointer;
-    &:hover {
+    a:hover {
         animation: pulses 2s linear 0s infinite alternate
     }
 }

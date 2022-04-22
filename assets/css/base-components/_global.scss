@@ -510,7 +510,7 @@ img.Slider-img {
         max-height: 112px;
         height: 100%;
         width: 100%;
-        object-fit: cover;
+        object-fit: contain;
     }
 }
 
@@ -521,9 +521,6 @@ img.Slider-img {
             .slick-list {
                 .thumb-img {
                     cursor: pointer;
-                }
-                .slick-slide.slick-active.slick-current {
-                    order: 1;
                 }
             }
         }

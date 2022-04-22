@@ -156,6 +156,7 @@
 .event-blogImg {
     @media all and (min-width: 1200px) {
         width: 609px;
+        max-width: 609px;
         height: 609px;
         object-fit: cover;
     }

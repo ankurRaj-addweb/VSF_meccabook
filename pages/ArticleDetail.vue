@@ -35,7 +35,6 @@
         <div class="container">
           <div class="banner-heading">
             <div class="row">
-              <!-- <div class="col-2 col-xl-2"></div> -->
               <div class="col-md-6 offset-md-2">
                 <div class="banner-desc-wrap">
                   <div class="date-address d-none d-md-block">
@@ -49,7 +48,6 @@
                   </div>
                 </div>
               </div>
-              <!-- <div class="col-2 col-xl-5"></div> -->
             </div>
           </div>
         </div>
@@ -107,13 +105,11 @@ export default{
   },
   methods: {
     ...mapActions("drupalcms", ["fetchArticleDetails"]),
-     formatCompat(d3) {
-      var initial = ((d3.toString()).replace(/-/g, "/").split(/\//));
-      var t = [initial[1], initial[0], initial[2]].join("/");
-      var d = new Date(t);
-      var dd = String(d.getDate()).padStart(2, "0");
-      var mm = d.getMonth();
-      var ms = [
+   formatCompat(d3) {
+      const initial = d3.toString().replace(/-/g, "/").split(/\//);
+      const t = [initial[1], initial[0], initial[2]].join("/");
+      const d = new Date(t);
+      const ms = [
         "January",
         "February",
         "March",
@@ -127,15 +123,18 @@ export default{
         "November",
         "December",
       ];
-      var yyyy = d.getFullYear();
-
-      d = ms[mm] + " " + dd  +"," + yyyy;
-      return d;
+      return (
+        ms[d.getMonth()] +
+        " " +
+        String(d.getDate()).padStart(2, "0") +
+        "," +
+        d.getFullYear()
+      );
     },
   },
-  async mounted() {
+  mounted() {
     const id = this.$route.params.nodeId;
-    await this.fetchArticleDetails(id);
+    this.fetchArticleDetails(id);
   },
 }
 </script>
@@ -172,6 +171,7 @@ export default{
           span{
             font-weight:400;
             line-height:25px;
+            font-family: "leksa-sans",sans-serif;
           }
         }
       }
@@ -179,6 +179,9 @@ export default{
   }
 }
 .detail-right-wrap{
+  @media all and (min-width: 768px) {
+    max-width: 715px;
+  }
   .desc-title.desc-pera{
     color: #4B4C4D;
   }
@@ -207,5 +210,11 @@ p.desc{
     height: 100%;
     z-index: -1;
   }
+}
+.d-view-img img {
+  @media all and (min-width: 768px) {
+    width: 715px;
+    height: 361px;
+  } 
 }
 </style>

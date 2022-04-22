@@ -24,7 +24,8 @@ export default {
   dev: config.get('nuxtAppEnvironment') !== 'production',
   publicRuntimeConfig: {
     drupalURL: process.env.DEV_MECCABOOK,
-    magentoURL: process.env.MAGENTO_MECCABOOK,  
+    magentoURL: process.env.MAGENTO_MECCABOOK,
+    stripeKey: process.env.STRIPE_PK
   },
   server: {
     port: config.get('nuxtAppPort'),
@@ -35,6 +36,11 @@ export default {
     script: [
       {
         src: `https://maps.googleapis.com/maps/api/js?libraries=places&key=${process.env.GOOGLE_MAP_APIKEY}`,
+      },
+      {
+        src: "https://cdn-loyalty.yotpo.com/loader/qabvEbl7ThW3xKeMZ0qBkw.js",
+        async: true,
+        crossorigin: "anonymous"
       },
     ],
     meta: [
@@ -220,5 +226,10 @@ export default {
     extendRoutes(routes) {
       getRoutes(`${__dirname}`).forEach((route) => routes.unshift(route));
     },
+    prefetchLinks: false,
   },
+  serverMiddleware: [
+    '~/server-middleware/paymentIntent.js',
+    '~/server-middleware/ribbinContent.js'
+  ]
 };
